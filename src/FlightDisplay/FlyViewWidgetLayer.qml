@@ -133,31 +133,11 @@ Item {
         id:                     photoVideoControl
         anchors.margins:        _toolsMargin
         anchors.right:          parent.right
-        width:                  _rightPanelWidth
+        anchors.bottom:         parent.bottom
+        width:                  scaleForSmallScreen ? _rightPanelWidth * 0.8 : _rightPanelWidth
 
         property real rightEdgeCenterInset: visible ? parent.width - x : 0
-
-        state:                  _verticalCenter ? "verticalCenter" : "topAnchor"
-        states: [
-            State {
-                name: "verticalCenter"
-                AnchorChanges {
-                    target:                 photoVideoControl
-                    anchors.top:            undefined
-                    anchors.verticalCenter: _root.verticalCenter
-                }
-            },
-            State {
-                name: "topAnchor"
-                AnchorChanges {
-                    target:                 photoVideoControl
-                    anchors.verticalCenter: undefined
-                    anchors.top:            instrumentPanel.bottom
-                }
-            }
-        ]
-
-        property bool _verticalCenter: !QGroundControl.settingsManager.flyViewSettings.alternateInstrumentPanel.rawValue
+        property bool scaleForSmallScreen:  QGroundControl.corePlugin.isHerelink
     }
 
     TelemetryValuesBar {
