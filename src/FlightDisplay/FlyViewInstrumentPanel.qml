@@ -21,9 +21,13 @@ Column {
 
     property real availableHeight
 
+    property bool scaleForSmallScreen: QGroundControl.corePlugin.isHerelink
+    property bool isVerticalInstrumentPanel: flightDisplayViewWidgets.source == "qrc:/qml/QGCInstrumentWidgetAlternate.qml"
+
     FlightDisplayViewWidgets {
         id:                 flightDisplayViewWidgets
-        width:              parent.width
+        width:              scaleForSmallScreen && isVerticalInstrumentPanel ? parent.width * 0.4 : parent.width * 0.8
         missionController:  _missionController
+        anchors.right:      parent.right
     }
 }

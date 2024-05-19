@@ -27,7 +27,8 @@
     "name":             "alternateInstrumentPanel",
     "shortDesc": "Use Vertical Instrument Panel instead of the default one",
     "type":             "bool",
-    "default":     false
+    "default":     false,
+    "rebootRequired": true
 },
 {
     "name":             "showAdditionalIndicatorsCompass",
