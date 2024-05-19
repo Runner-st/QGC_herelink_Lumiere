@@ -17,6 +17,7 @@ import QGroundControl.Controls      1.0
 import QGroundControl.Palette       1.0
 
 Rectangle {
+    id:         terrainProgressRoot
     height:     mainLayout.height + (_margins * 2)
     visible:    false
     color:      qgcPal.window
@@ -34,6 +35,7 @@ Rectangle {
             visibilityTimer.restart()
         } else {
             visible = true
+            opacity = 1.0
             visibilityTimer.stop()
         }
     }
@@ -42,16 +44,30 @@ Rectangle {
         if (_blocksLoaded != 0) {
             // This causes the progress indicator to display even if it starts out as complete
             visible = true
+            opacity = 1.0
             if (_blocksPending == 0) {
                 visibilityTimer.restart()
             }
         }
     }
 
+    SequentialAnimation on opacity { 
+        id: opacityAnimation
+        running: false
+        loops: 1
+        PropertyAnimation {
+            to: 0
+            duration: 800
+        }
+        onStopped: {
+            terrainProgressRoot.visible = false
+        }
+    }
+
     Timer {
         id:             visibilityTimer
-        interval:       30 * 1000
-        onTriggered:    parent.visible = false
+        interval:       6 * 1000
+        onTriggered:    opacityAnimation.restart()
     }
 
     QGCPalette { id: qgcPal }
