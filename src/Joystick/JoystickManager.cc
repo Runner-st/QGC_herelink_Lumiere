@@ -66,6 +66,7 @@ void JoystickManager::init() {
     connect(this, &JoystickManager::updateAvailableJoysticksSignal, this, &JoystickManager::restartJoystickCheckTimer);
 #endif
     connect(&_joystickCheckTimer, &QTimer::timeout, this, &JoystickManager::_updateAvailableJoysticks);
+    _updateAvailableJoysticks();
     _joystickCheckTimerCounter = 5;
     _joystickCheckTimer.start(1000);
 }
