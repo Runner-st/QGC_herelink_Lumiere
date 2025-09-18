@@ -9,6 +9,7 @@
 #include "HorizontalFactValueGrid.h"
 #include "InstrumentValueData.h"
 #include "FactValueGrid.h"
+#include "ServoControlController.h"
 
 #include <list>
 
@@ -23,6 +24,7 @@ HerelinkCorePlugin::HerelinkCorePlugin(QObject* parent)
     : QGCCorePlugin(parent)
 {
     _herelinkOptions = new HerelinkOptions(this, nullptr);
+    _servoControlController = new ServoControlController(this);
 
     // TODO: We may need to connect to signals here instead of setToolbox
     // auto multiVehicleManager = qgcApp()->toolbox()->multiVehicleManager();

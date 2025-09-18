@@ -73,6 +73,10 @@ set(CUSTOM_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HerelinkCorePlugin.json
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HerelinkOptions.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/HerelinkOptions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ServoControlController.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ServoControlController.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ServoControlSettings.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ServoControlSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/herelink/VideoStreamControl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/herelink/VideoStreamControl.h
     CACHE INTERNAL "" FORCE

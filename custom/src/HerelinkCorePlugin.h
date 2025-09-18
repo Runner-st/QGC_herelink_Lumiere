@@ -11,6 +11,8 @@
 
 Q_DECLARE_LOGGING_CATEGORY(HerelinkCorePluginLog)
 
+class ServoControlController;
+
 class HerelinkCorePlugin : public QGCCorePlugin
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ public:
     static HerelinkCorePlugin* instance();
 
     Q_PROPERTY(bool isHerelink READ isHerelink CONSTANT)
+    Q_PROPERTY(QObject* servoControlController READ servoControlController CONSTANT)
     bool isHerelink (void) const { return true; }
 
     // Overrides from QGCCorePlugin
@@ -30,11 +33,14 @@ public:
     void        factValueGridCreateDefaultSettings     (FactValueGrid* factValueGrid) override;
 
 
+    QObject* servoControlController() const { return _servoControlController; }
+
 private slots:
     void _activeVehicleChanged(Vehicle* activeVehicle);
 
 private:
     HerelinkOptions* _herelinkOptions = nullptr;
+    ServoControlController* _servoControlController = nullptr;
 };
 
 Q_APPLICATION_STATIC(HerelinkCorePlugin, _herelinkCorePluginInstance);
