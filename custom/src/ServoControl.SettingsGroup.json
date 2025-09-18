@@ -1,0 +1,12 @@
+{
+    "version": 1,
+    "fileType": "FactMetaData",
+    "QGC.MetaData.Facts": [
+        {
+            "name": "buttonsJson",
+            "shortDesc": "Stored servo control button configuration",
+            "type": "string",
+            "default": "[]"
+        }
+    ]
+}

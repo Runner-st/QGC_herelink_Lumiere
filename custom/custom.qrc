@@ -5,6 +5,12 @@
     </qresource>
     <qresource prefix="Custom/Widgets">
     </qresource>
+    <qresource prefix="/json">
+        <file alias="ServoControl.SettingsGroup.json">src/ServoControl.SettingsGroup.json</file>
+    </qresource>
     <qresource prefix="/qml">
+        <file alias="Custom/ServoControl/ServoControlSettingsPage.qml">res/ServoControl/ServoControlSettingsPage.qml</file>
+        <file alias="QGroundControl/AppSettings/SettingsPagesModel.qml">res/Custom/AppSettings/SettingsPagesModel.qml</file>
+        <file alias="QGroundControl/FlightDisplay/FlyViewCustomLayer.qml">res/ServoControl/FlyViewCustomLayer.qml</file>
     </qresource>
 </RCC>
