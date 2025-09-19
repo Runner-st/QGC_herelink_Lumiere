@@ -31,6 +31,10 @@ Item {
 
     readonly property real _buttonMargin: ScreenTools.defaultFontPixelWidth
 
+    readonly property real _servoBottomInset: servoButtonColumn.visible ? servoButtonColumn.height + (servoButtonColumn.anchors.bottomMargin * 2) : 0
+
+    property real servoButtonsInset: _servoBottomInset
+
     Column {
         id: servoButtonColumn
         anchors.left: parent.left
@@ -69,7 +73,7 @@ Item {
         topEdgeLeftInset:       parentToolInsets.topEdgeLeftInset
         topEdgeCenterInset:     parentToolInsets.topEdgeCenterInset
         topEdgeRightInset:      parentToolInsets.topEdgeRightInset
-        bottomEdgeLeftInset:    Math.max(parentToolInsets.bottomEdgeLeftInset, servoButtonColumn.visible ? servoButtonColumn.height + (servoButtonColumn.anchors.bottomMargin * 2) : parentToolInsets.bottomEdgeLeftInset)
+        bottomEdgeLeftInset:    Math.max(parentToolInsets.bottomEdgeLeftInset, _servoBottomInset)
         bottomEdgeCenterInset:  parentToolInsets.bottomEdgeCenterInset
         bottomEdgeRightInset:   parentToolInsets.bottomEdgeRightInset
     }

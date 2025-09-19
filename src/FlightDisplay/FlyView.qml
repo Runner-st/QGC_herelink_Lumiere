@@ -112,7 +112,7 @@ Item {
             anchors.left:           parent.left
             anchors.bottom:         parent.bottom
             anchors.leftMargin:     _toolsMargin
-            anchors.bottomMargin:   Math.max(_toolsMargin, customOverlay.totalToolInsets.bottomEdgeLeftInset)
+            anchors.bottomMargin:   Math.max(_toolsMargin, customOverlay.servoButtonsInset)
             item1IsFullSettingsKey: "MainFlyWindowIsMap"
             item1:                  mapControl
             item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null

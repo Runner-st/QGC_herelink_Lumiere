@@ -14,6 +14,7 @@ import QtQuick.Layouts
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
+import "qrc:/qml/QGroundControl/AppSettings"
 
 SettingsPage {
     id: root
@@ -137,7 +138,7 @@ SettingsPage {
                 QGCButton {
                     Layout.preferredWidth: implicitWidth
                     text: editingIndex === -1 ? qsTr("Add Button") : qsTr("Save Changes")
-                    enabled: controller !== null
+                    enabled: !!controller
 
                     onClicked: {
                         if (!controller) {
