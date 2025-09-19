@@ -1,7 +1,6 @@
 #include "ServoControlController.h"
 
 #include "QGCApplication.h"
-#include "QGCToolbox.h"
 #include "MultiVehicleManager.h"
 #include "ServoControlSettings.h"
 #include "Vehicle.h"
@@ -91,7 +90,7 @@ void ServoControlController::triggerButton(int index)
         return;
     }
 
-    Vehicle* vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
+    Vehicle* vehicle = MultiVehicleManager::instance()->activeVehicle();
     if (!vehicle) {
         qgcApp()->showAppMessage(tr("No active vehicle to send servo command."));
         return;
