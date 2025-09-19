@@ -24,11 +24,18 @@ HerelinkCorePlugin::HerelinkCorePlugin(QObject* parent)
     : QGCCorePlugin(parent)
 {
     _herelinkOptions = new HerelinkOptions(this, nullptr);
-    _servoControlController = new ServoControlController(this);
 
     // TODO: We may need to connect to signals here instead of setToolbox
     // auto multiVehicleManager = qgcApp()->toolbox()->multiVehicleManager();
     // connect(multiVehicleManager, &MultiVehicleManager::activeVehicleChanged, this, &HerelinkCorePlugin::_activeVehicleChanged);
+}
+
+QObject* HerelinkCorePlugin::servoControlController()
+{
+    if (!_servoControlController) {
+        _servoControlController = new ServoControlController(this);
+    }
+    return _servoControlController;
 }
 
 
