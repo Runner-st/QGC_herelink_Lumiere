@@ -33,7 +33,7 @@ public:
     void        factValueGridCreateDefaultSettings     (FactValueGrid* factValueGrid) override;
 
 
-    QObject* servoControlController() const { return _servoControlController; }
+    QObject* servoControlController();
 
 private slots:
     void _activeVehicleChanged(Vehicle* activeVehicle);
