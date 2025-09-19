@@ -111,7 +111,8 @@ Item {
             id:                     _pipView
             anchors.left:           parent.left
             anchors.bottom:         parent.bottom
-            anchors.margins:        _toolsMargin
+            anchors.leftMargin:     _toolsMargin
+            anchors.bottomMargin:   Math.max(_toolsMargin, customOverlay.servoButtonsInset)
             item1IsFullSettingsKey: "MainFlyWindowIsMap"
             item1:                  mapControl
             item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
@@ -119,8 +120,8 @@ Item {
                                         (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
             z:                      QGroundControl.zOrderWidgets
 
-            property real leftEdgeBottomInset: visible ? width + anchors.margins : 0
-            property real bottomEdgeLeftInset: visible ? height + anchors.margins : 0
+            property real leftEdgeBottomInset: visible ? width + anchors.leftMargin : 0
+            property real bottomEdgeLeftInset: visible ? height + anchors.bottomMargin : 0
         }
 
         FlyViewWidgetLayer {
