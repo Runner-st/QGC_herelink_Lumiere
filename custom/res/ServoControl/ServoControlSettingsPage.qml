@@ -185,46 +185,73 @@ SettingsPage {
                     border.color: QGroundControl.globalPalette.groupBorder
                     radius: ScreenTools.defaultFontPixelHeight / 3
 
+                    readonly property real contentMargin: ScreenTools.defaultFontPixelHeight / 2
+
+                    implicitHeight: contentColumn.implicitHeight + (contentMargin * 2)
+
                     ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: ScreenTools.defaultFontPixelHeight / 2
+                        id: contentColumn
+                        anchors {
+                            fill: parent
+                            margins: contentMargin
+                        }
                         spacing: ScreenTools.defaultFontPixelHeight / 2
-
-                        QGCLabel {
-                            Layout.fillWidth: true
-                            text: modelData.name
-                            font.bold: true
-                        }
-
-                        QGCLabel {
-                            Layout.fillWidth: true
-                            text: qsTr("Servo %1 • %2 µs").arg(modelData.servoOutput).arg(modelData.pulseWidth)
-                            font.pointSize: ScreenTools.smallFontPointSize
-                        }
 
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: ScreenTools.defaultFontPixelWidth
 
-                            QGCButton {
-                                text: qsTr("Edit")
-                                onClicked: {
-                                    editingIndex = index
-                                    nameField.text = modelData.name
-                                    servoField.text = modelData.servoOutput
-                                    pulseField.text = modelData.pulseWidth
-                                    _clearValidation()
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: ScreenTools.defaultFontPixelHeight / 4
+
+                                QGCLabel {
+                                    Layout.fillWidth: true
+                                    text: modelData.name
+                                    font.bold: true
+                                }
+
+                                QGCLabel {
+                                    Layout.fillWidth: true
+                                    text: qsTr("Servo %1 • %2 µs").arg(modelData.servoOutput).arg(modelData.pulseWidth)
+                                    font.pointSize: ScreenTools.smallFontPointSize
+                                    color: QGroundControl.globalPalette.textDisabled
                                 }
                             }
 
-                            QGCButton {
-                                text: qsTr("Delete")
-                                onClicked: {
-                                    if (controller) {
-                                        controller.removeButton(index)
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: 0
+                            }
+
+                            ColumnLayout {
+                                spacing: ScreenTools.defaultFontPixelHeight / 4
+                                Layout.alignment: Qt.AlignRight | Qt.AlignTop
+
+                                QGCButton {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: implicitWidth
+                                    text: qsTr("Edit")
+                                    onClicked: {
+                                        editingIndex = index
+                                        nameField.text = modelData.name
+                                        servoField.text = modelData.servoOutput
+                                        pulseField.text = modelData.pulseWidth
+                                        _clearValidation()
                                     }
-                                    if (editingIndex === index) {
-                                        _resetForm()
+                                }
+
+                                QGCButton {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: implicitWidth
+                                    text: qsTr("Delete")
+                                    onClicked: {
+                                        if (controller) {
+                                            controller.removeButton(index)
+                                        }
+                                        if (editingIndex === index) {
+                                            _resetForm()
+                                        }
                                     }
                                 }
                             }
