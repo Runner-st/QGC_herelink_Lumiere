@@ -2,6 +2,7 @@
 name: Android 32/64-bit Release
 
 on:
+  workflow_dispatch:    # manual trigger
   push:
     branches:
       - 'master'
