@@ -166,7 +166,7 @@ SettingsPage {
 
         ColumnLayout {
             Layout.fillWidth: true
-            visible: controller && controller.buttons.length > 0
+            visible: controller && controller.buttons && controller.buttons.length > 0
 
             QGCLabel {
                 Layout.fillWidth: true
@@ -175,7 +175,7 @@ SettingsPage {
             }
 
             Repeater {
-                model: controller ? controller.buttons : []
+                model: controller && controller.buttons ? controller.buttons : []
 
                 delegate: Rectangle {
                     Layout.fillWidth: true
