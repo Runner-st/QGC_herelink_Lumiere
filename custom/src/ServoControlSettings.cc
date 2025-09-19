@@ -32,7 +32,6 @@ void ServoControlSettings::setButtons(const QVariantList& buttons)
 
     const QVariantList sanitized = _sanitizeButtons(buttons);
     QJsonArray array;
-    array.reserve(sanitized.size());
     for (const QVariant& value : sanitized) {
         const QVariantMap map = value.toMap();
         QJsonObject object;
