@@ -27,6 +27,7 @@ Item {
     property var mapControl
 
     readonly property var controller: QGroundControl.corePlugin.servoControlController
+    readonly property bool _hasButtons: controller && controller.buttons && controller.buttons.length > 0
 
     readonly property real _buttonMargin: ScreenTools.defaultFontPixelWidth
 
@@ -37,10 +38,10 @@ Item {
         anchors.leftMargin: _buttonMargin
         anchors.bottomMargin: ScreenTools.defaultFontPixelHeight
         spacing: ScreenTools.defaultFontPixelHeight / 2
-        visible: controller && controller.buttons.length > 0
+        visible: _root.visible && _hasButtons
 
         Repeater {
-            model: controller ? controller.buttons : []
+            model: _hasButtons ? controller.buttons : []
 
             delegate: QGCButton {
                 text: modelData.name
