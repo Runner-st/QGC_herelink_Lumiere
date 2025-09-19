@@ -14,6 +14,9 @@ ServoControlController::ServoControlController(QObject* parent)
     , _settings(new ServoControlSettings(this))
 {
     connect(_settings, &ServoControlSettings::buttonsChanged, this, &ServoControlController::_onButtonsChanged);
+    if (MultiVehicleManager* manager = MultiVehicleManager::instance()) {
+        connect(manager, &MultiVehicleManager::activeVehicleChanged, this, &ServoControlController::_handleActiveVehicleChanged);
+    }
     _onButtonsChanged();
 }
 
@@ -71,11 +74,10 @@ void ServoControlController::removeButton(int index)
     _settings->setButtons(current);
 
     if (_activeButtonIndex == index) {
-        _activeButtonIndex = -1;
-        emit activeButtonIndexChanged(_activeButtonIndex);
+        _setActiveButtonIndex(-1);
     } else if (_activeButtonIndex > index) {
-        _activeButtonIndex--;
-        emit activeButtonIndexChanged(_activeButtonIndex);
+        const int newIndex = _activeButtonIndex - 1;
+        _setActiveButtonIndex(newIndex);
     }
 }
 
@@ -116,10 +118,7 @@ void ServoControlController::triggerButton(int index)
         servoOutput,
         pulseWidth);
 
-    if (_activeButtonIndex != index) {
-        _activeButtonIndex = index;
-        emit activeButtonIndexChanged(_activeButtonIndex);
-    }
+    _setActiveButtonIndex(index);
 }
 
 void ServoControlController::_onButtonsChanged()
@@ -127,7 +126,22 @@ void ServoControlController::_onButtonsChanged()
     emit buttonsChanged();
     const int buttonCount = _settings ? _settings->buttons().count() : 0;
     if (_activeButtonIndex >= buttonCount) {
-        _activeButtonIndex = -1;
-        emit activeButtonIndexChanged(_activeButtonIndex);
+        _setActiveButtonIndex(-1);
     }
+}
+
+void ServoControlController::_handleActiveVehicleChanged(Vehicle* activeVehicle)
+{
+    Q_UNUSED(activeVehicle);
+    _setActiveButtonIndex(-1);
+}
+
+void ServoControlController::_setActiveButtonIndex(int index)
+{
+    if (_activeButtonIndex == index) {
+        return;
+    }
+
+    _activeButtonIndex = index;
+    emit activeButtonIndexChanged(_activeButtonIndex);
 }
