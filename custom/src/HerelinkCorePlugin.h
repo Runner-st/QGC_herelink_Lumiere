@@ -9,9 +9,9 @@
 #include <QObject>
 #include <QtCore/qapplicationstatic.h>
 
-Q_DECLARE_LOGGING_CATEGORY(HerelinkCorePluginLog)
+#include "ServoControlController.h"
 
-class ServoControlController;
+Q_DECLARE_LOGGING_CATEGORY(HerelinkCorePluginLog)
 
 class HerelinkCorePlugin : public QGCCorePlugin
 {
