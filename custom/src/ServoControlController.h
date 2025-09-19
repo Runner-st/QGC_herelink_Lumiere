@@ -4,6 +4,7 @@
 #include <QtCore/QVariantList>
 
 class ServoControlSettings;
+class Vehicle;
 
 class ServoControlController : public QObject
 {
@@ -29,8 +30,11 @@ signals:
 
 private slots:
     void _onButtonsChanged();
+    void _handleActiveVehicleChanged(Vehicle* activeVehicle);
 
 private:
+    void _setActiveButtonIndex(int index);
+
     ServoControlSettings* _settings = nullptr;
     int _activeButtonIndex = -1;
 };
