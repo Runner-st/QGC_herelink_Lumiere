@@ -100,7 +100,21 @@ void ServoControlController::triggerButton(int index)
     const float servoOutput = static_cast<float>(map.value(QStringLiteral("servoOutput")).toInt());
     const float pulseWidth = static_cast<float>(map.value(QStringLiteral("pulseWidth")).toDouble());
 
-    vehicle->sendMavCommand(vehicle->defaultComponentId(), MAV_CMD_DO_SET_SERVO, true, servoOutput, pulseWidth);
+    auto unsupportedHandler = []() {
+        static bool sUnsupportedWarningShown = false;
+        if (!sUnsupportedWarningShown) {
+            qgcApp()->showAppMessage(QObject::tr("Active vehicle does not support direct servo commands."));
+            sUnsupportedWarningShown = true;
+        }
+    };
+
+    vehicle->sendMavCommandWithLambdaFallback(
+        unsupportedHandler,
+        vehicle->defaultComponentId(),
+        MAV_CMD_DO_SET_SERVO,
+        false,
+        servoOutput,
+        pulseWidth);
 
     if (_activeButtonIndex != index) {
         _activeButtonIndex = index;
