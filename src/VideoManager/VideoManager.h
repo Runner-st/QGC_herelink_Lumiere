@@ -57,7 +57,8 @@ public:
     Q_PROPERTY(bool             decoding                READ    decoding                                    NOTIFY decodingChanged)
     Q_PROPERTY(bool             recording               READ    recording                                   NOTIFY recordingChanged)
     Q_PROPERTY(QSize            videoSize               READ    videoSize                                   NOTIFY videoSizeChanged)
-    // Specific to Herelink only, to manage HDMI switching    
+    Q_PROPERTY(bool             secondaryVideoAvailable READ    secondaryVideoAvailable                     NOTIFY secondaryVideoChanged)
+    // Specific to Herelink only, to manage HDMI switching
     Q_PROPERTY(VideoStreamControl* videoStreamControl   READ    videoStreamControl                          CONSTANT)
 
     virtual bool        hasVideo            ();
@@ -89,6 +90,10 @@ public:
     QSize videoSize(void) {
         const quint32 size = _videoSize;
         return QSize((size >> 16) & 0xFFFF, size & 0xFFFF);
+    }
+
+    bool secondaryVideoAvailable(void) const {
+        return !_videoUri[1].isEmpty();
     }
 
     VideoStreamControl* videoStreamControl () { return _videoStreamControl; }
@@ -134,6 +139,7 @@ signals:
     void recordingChanged           ();
     void recordingStarted           ();
     void videoSizeChanged           ();
+    void secondaryVideoChanged      ();
 
 protected slots:
     void _videoSourceChanged        ();
