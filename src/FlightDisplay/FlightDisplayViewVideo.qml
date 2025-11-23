@@ -204,7 +204,7 @@ Item {
             Loader {
                 id:                 primaryLoader
                 anchors.fill:       parent
-                active:             QGroundControl.videoManager.decoding
+                active:             QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue
                 sourceComponent:    videoBackgroundComponent
                 property bool showGrid: parent.isMain && !QGroundControl.videoManager.fullScreen
                 onLoaded: {
@@ -233,7 +233,7 @@ Item {
             Loader {
                 id:                 secondaryLoader
                 anchors.fill:       parent
-                active:             QGroundControl.videoManager.decoding && QGroundControl.videoManager.secondaryVideoAvailable
+                active:             QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue && QGroundControl.videoManager.secondaryVideoAvailable
                 sourceComponent:    videoBackgroundComponent
                 property bool showGrid: parent.isMain && !QGroundControl.videoManager.fullScreen
                 onLoaded: {
