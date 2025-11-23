@@ -40,7 +40,7 @@ Item {
         Component.onCompleted:  start()
     }
 
-    property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
+    property bool   _mainWindowIsMap:       false
     property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property var    _missionController:     _planController.missionController
@@ -153,13 +153,15 @@ Item {
         id:                     mapControl
         planMasterController:   _planController
         rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        pipMode:                !_mainWindowIsMap
+        pipMode:                false
         toolInsets:             customOverlay.totalToolInsets
         mapName:                "FlightDisplayView"
+        visible:                false
     }
 
     FlyViewVideo {
-        id: videoControl
+        id:             videoControl
+        anchors.fill:   parent
     }
 
     QGCPipOverlay {
@@ -168,11 +170,10 @@ Item {
         anchors.bottom:         parent.bottom
         anchors.margins:        _toolsMargin
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
-        item1:                  mapControl
-        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
+        item1:                  videoControl
+        item2:                  null
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
-        show:                   !QGroundControl.videoManager.fullScreen &&
-                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
+        show:                   false
     }
 }

@@ -789,8 +789,13 @@ VideoManager::_updateVideoUri(unsigned id, const QString& uri)
     if (uri == _videoUri[id]) {
         return false;
     }
+    const bool oldSecondaryAvailable = secondaryVideoAvailable();
 
     _videoUri[id] = uri;
+
+    if (id == 1 && oldSecondaryAvailable != secondaryVideoAvailable()) {
+        emit secondaryVideoChanged();
+    }
 
     return true;
 }
