@@ -76,6 +76,61 @@ Item {
         anchors.fill:   parent
         color:          "black"
         visible:        QGroundControl.videoManager.decoding
+        property bool primaryIsMain: true
+        property real pipScale: 0.3
+
+        function _pipSize() {
+            return Qt.size(parent.width * pipScale, parent.height * pipScale)
+        }
+
+        function _resetAnchors(targetItem) {
+            targetItem.anchors.fill = undefined
+            targetItem.anchors.top = undefined
+            targetItem.anchors.bottom = undefined
+            targetItem.anchors.left = undefined
+            targetItem.anchors.right = undefined
+            targetItem.anchors.margins = 0
+        }
+
+        function updateSecondaryOpacity() {
+            if (secondaryLoader.item) {
+                secondaryLoader.item.opacity = _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 1.0
+            }
+        }
+
+        function updateVideoLayout() {
+            var pipSize = _pipSize()
+            primaryContainer.isMain = primaryIsMain
+            secondaryContainer.isMain = !primaryIsMain
+
+            _resetAnchors(primaryContainer)
+            _resetAnchors(secondaryContainer)
+
+            if (primaryIsMain) {
+                primaryContainer.anchors.fill = videoBackground
+                primaryContainer.z = 1
+
+                secondaryContainer.width = pipSize.width
+                secondaryContainer.height = pipSize.height
+                secondaryContainer.anchors.right = videoBackground.right
+                secondaryContainer.anchors.bottom = videoBackground.bottom
+                secondaryContainer.anchors.margins = ScreenTools.defaultFontPixelWidth
+                secondaryContainer.z = 2
+            } else {
+                secondaryContainer.anchors.fill = videoBackground
+                secondaryContainer.z = 1
+
+                primaryContainer.width = pipSize.width
+                primaryContainer.height = pipSize.height
+                primaryContainer.anchors.right = videoBackground.right
+                primaryContainer.anchors.bottom = videoBackground.bottom
+                primaryContainer.anchors.margins = ScreenTools.defaultFontPixelWidth
+                primaryContainer.z = 2
+            }
+
+            primaryLoader.showGrid = primaryContainer.isMain && !QGroundControl.videoManager.fullScreen
+            secondaryLoader.showGrid = secondaryContainer.isMain && !QGroundControl.videoManager.fullScreen
+        }
         function getWidth() {
             //-- Fit Width or Stretch
             if(_fitMode === 0 || _fitMode === 2) {
@@ -96,6 +151,7 @@ Item {
             id: videoBackgroundComponent
             QGCVideoBackground {
                 id:             videoContent
+                property bool showGrid: false
                 objectName:     "videoContent"
 
                 Connections {
@@ -113,83 +169,109 @@ Item {
                     height: parent.height
                     width:  1
                     x:      parent.width * 0.33
-                    visible: _showGrid && !QGroundControl.videoManager.fullScreen
+                    visible: _showGrid && videoContent.showGrid
                 }
                 Rectangle {
                     color:  Qt.rgba(1,1,1,0.5)
                     height: parent.height
                     width:  1
                     x:      parent.width * 0.66
-                    visible: _showGrid && !QGroundControl.videoManager.fullScreen
+                    visible: _showGrid && videoContent.showGrid
                 }
                 Rectangle {
                     color:  Qt.rgba(1,1,1,0.5)
                     width:  parent.width
                     height: 1
                     y:      parent.height * 0.33
-                    visible: _showGrid && !QGroundControl.videoManager.fullScreen
+                    visible: _showGrid && videoContent.showGrid
                 }
                 Rectangle {
                     color:  Qt.rgba(1,1,1,0.5)
                     width:  parent.width
                     height: 1
                     y:      parent.height * 0.66
-                    visible: _showGrid && !QGroundControl.videoManager.fullScreen
+                    visible: _showGrid && videoContent.showGrid
                 }
             }
         }
-        Loader {
-            // GStreamer is causing crashes on Lenovo laptop OpenGL Intel drivers. In order to workaround this
-            // we don't load a QGCVideoBackground object when video is disabled. This prevents any video rendering
-            // code from running. Setting QGCVideoBackground.receiver = null does not work to prevent any
-            // video OpenGL from being generated. Hence the Loader to completely remove it.
-            height:             parent.getHeight()
-            width:              parent.getWidth()
-            anchors.centerIn:   parent
-            visible:            QGroundControl.videoManager.decoding
-            sourceComponent:    videoBackgroundComponent
-
-            property bool videoDisabled: QGroundControl.settingsManager.videoSettings.videoSource.rawValue === QGroundControl.settingsManager.videoSettings.disabledVideoSource
-        }
-
-        //-- Thermal Image
         Item {
-            id:                 thermalItem
-            width:              height * QGroundControl.videoManager.thermalAspectRatio
-            height:             _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_FULL ? parent.height : (_camera.thermalMode === QGCCameraControl.THERMAL_PIP ? ScreenTools.defaultFontPixelHeight * 12 : parent.height * _thermalHeightFactor)) : 0
-            anchors.centerIn:   parent
-            visible:            QGroundControl.videoManager.hasThermal && _camera.thermalMode !== QGCCameraControl.THERMAL_OFF
-            function pipOrNot() {
-                if(_camera) {
-                    if(_camera.thermalMode === QGCCameraControl.THERMAL_PIP) {
-                        anchors.centerIn    = undefined
-                        anchors.top         = parent.top
-                        anchors.topMargin   = mainWindow.header.height + (ScreenTools.defaultFontPixelHeight * 0.5)
-                        anchors.left        = parent.left
-                        anchors.leftMargin  = ScreenTools.defaultFontPixelWidth * 12
-                    } else {
-                        anchors.top         = undefined
-                        anchors.topMargin   = undefined
-                        anchors.left        = undefined
-                        anchors.leftMargin  = undefined
-                        anchors.centerIn    = parent
-                    }
+            id:                     primaryContainer
+            property bool isMain:   true
+            width:                  parent.width
+            height:                 parent.height
+
+            Loader {
+                id:                 primaryLoader
+                anchors.fill:       parent
+                active:             QGroundControl.videoManager.decoding
+                sourceComponent:    videoBackgroundComponent
+                property bool showGrid: parent.isMain && !QGroundControl.videoManager.fullScreen
+                onLoaded: {
+                    item.objectName = "videoContent"
+                    item.showGrid = showGrid
                 }
+                onShowGridChanged: if (item) { item.showGrid = showGrid }
             }
-            Connections {
-                target:                 _camera
-                onThermalModeChanged:   thermalItem.pipOrNot()
-            }
-            onVisibleChanged: {
-                thermalItem.pipOrNot()
-            }
-            QGCVideoBackground {
-                id:             thermalVideo
-                objectName:     "thermalVideo"
+
+            Rectangle {
                 anchors.fill:   parent
-                receiver:       QGroundControl.videoManager.thermalVideoReceiver
-                opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
+                color:          "transparent"
+                border.color:   "white"
+                border.width:   ScreenTools.defaultFontPixelWidth / 2
+                radius:         ScreenTools.defaultFontPixelWidth
+                visible:        !parent.isMain && QGroundControl.videoManager.secondaryVideoAvailable
             }
+        }
+
+        Item {
+            id:                     secondaryContainer
+            property bool isMain:   false
+            visible:                QGroundControl.videoManager.secondaryVideoAvailable && QGroundControl.videoManager.decoding
+
+            Loader {
+                id:                 secondaryLoader
+                anchors.fill:       parent
+                active:             QGroundControl.videoManager.decoding && QGroundControl.videoManager.secondaryVideoAvailable
+                sourceComponent:    videoBackgroundComponent
+                property bool showGrid: parent.isMain && !QGroundControl.videoManager.fullScreen
+                onLoaded: {
+                    item.objectName = "thermalVideo"
+                    item.showGrid = showGrid
+                    videoBackground.updateSecondaryOpacity()
+                }
+                onShowGridChanged: if (item) { item.showGrid = showGrid }
+            }
+
+            Rectangle {
+                anchors.fill:   parent
+                color:          "transparent"
+                border.color:   "white"
+                border.width:   ScreenTools.defaultFontPixelWidth / 2
+                radius:         ScreenTools.defaultFontPixelWidth
+                visible:        !parent.isMain
+            }
+
+            MouseArea {
+                anchors.fill:   parent
+                enabled:        secondaryContainer.visible
+                onClicked:      videoBackground.primaryIsMain = !videoBackground.primaryIsMain
+            }
+        }
+
+        onPrimaryIsMainChanged: updateVideoLayout()
+        onWidthChanged:         updateVideoLayout()
+        onHeightChanged:        updateVideoLayout()
+
+        Component.onCompleted:  updateVideoLayout()
+
+        Connections {
+            target: QGroundControl.videoManager
+            onSecondaryVideoChanged: videoBackground.updateVideoLayout()
+        }
+        Connections {
+            target: _camera
+            onThermalModeChanged: videoBackground.updateSecondaryOpacity()
+            onThermalOpacityChanged: videoBackground.updateSecondaryOpacity()
         }
         //-- Zoom
         PinchArea {
