@@ -98,6 +98,18 @@ Item {
             }
         }
 
+        function updateReceivers() {
+            if (primaryLoader.item && secondaryLoader.item) {
+                if (primaryIsMain) {
+                    primaryLoader.item.receiver = QGroundControl.videoManager.videoReceiver
+                    secondaryLoader.item.receiver = QGroundControl.videoManager.thermalVideoReceiver
+                } else {
+                    primaryLoader.item.receiver = QGroundControl.videoManager.thermalVideoReceiver
+                    secondaryLoader.item.receiver = QGroundControl.videoManager.videoReceiver
+                }
+            }
+        }
+
         function updateVideoLayout() {
             var pipSize = _pipSize()
             primaryContainer.isMain = primaryIsMain
@@ -130,6 +142,8 @@ Item {
 
             primaryLoader.showGrid = primaryContainer.isMain && !QGroundControl.videoManager.fullScreen
             secondaryLoader.showGrid = secondaryContainer.isMain && !QGroundControl.videoManager.fullScreen
+
+            updateReceivers()
         }
         function getWidth() {
             //-- Fit Width or Stretch
@@ -210,7 +224,7 @@ Item {
                 onLoaded: {
                     item.objectName = "videoContent"
                     item.showGrid = showGrid
-                    item.receiver = QGroundControl.videoManager.videoReceiver
+                    item.receiver = primaryContainer.isMain ? QGroundControl.videoManager.videoReceiver : QGroundControl.videoManager.thermalVideoReceiver
                 }
                 onShowGridChanged: if (item) { item.showGrid = showGrid }
             }
@@ -239,7 +253,7 @@ Item {
                 onLoaded: {
                     item.objectName = "thermalVideo"
                     item.showGrid = showGrid
-                    item.receiver = QGroundControl.videoManager.thermalVideoReceiver
+                    item.receiver = secondaryContainer.isMain ? QGroundControl.videoManager.videoReceiver : QGroundControl.videoManager.thermalVideoReceiver
                     videoBackground.updateSecondaryOpacity()
                 }
                 onShowGridChanged: if (item) { item.showGrid = showGrid }
