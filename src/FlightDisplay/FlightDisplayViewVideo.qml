@@ -153,6 +153,7 @@ Item {
                 id:             videoContent
                 property bool showGrid: false
                 objectName:     "videoContent"
+                receiver:       null
 
                 Connections {
                     target: QGroundControl.videoManager
@@ -209,6 +210,7 @@ Item {
                 onLoaded: {
                     item.objectName = "videoContent"
                     item.showGrid = showGrid
+                    item.receiver = QGroundControl.videoManager.videoReceiver
                 }
                 onShowGridChanged: if (item) { item.showGrid = showGrid }
             }
@@ -237,6 +239,7 @@ Item {
                 onLoaded: {
                     item.objectName = "thermalVideo"
                     item.showGrid = showGrid
+                    item.receiver = QGroundControl.videoManager.thermalVideoReceiver
                     videoBackground.updateSecondaryOpacity()
                 }
                 onShowGridChanged: if (item) { item.showGrid = showGrid }
