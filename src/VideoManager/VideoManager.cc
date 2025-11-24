@@ -749,8 +749,10 @@ VideoManager::_updateSettings(unsigned id)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("udp://0.0.0.0:8888"));
     else if (source == VideoSettings::videoSourceYuneecMantisG)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("rtsp://192.168.42.1:554/live"));
-    else if (source == VideoSettings::videoSourceHerelinkAirUnit)
+    else if (source == VideoSettings::videoSourceHerelinkAirUnit) {
         settingsChanged |= _updateVideoUri(0, QStringLiteral("rtsp://192.168.0.10:8554/H264Video"));
+        settingsChanged |= _updateVideoUri(1, QStringLiteral("rtsp://192.168.0.10:8554/H264Video2"));
+    }
     else if (source == VideoSettings::videoSourceHerelinkHotspot)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("rtsp://192.168.43.1:8554/fpv_stream"));
     else if (source == VideoSettings::videoDisabled || source == VideoSettings::videoSourceNoVideo)
