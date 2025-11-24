@@ -41,7 +41,7 @@ DEFINES += QGC_ORG_NAME=\"\\\"cubepilot.org\\\"\"
 DEFINES += QGC_ORG_DOMAIN=\"\\\"org.cubepilot\\\"\"
 
 QGC_APP_NAME        = "Lumiere QGC"
-QGC_BINARY_NAME     = "Lumiere Herelink QGC"
+QGC_BINARY_NAME     = "Lumiere QGC"
 QGC_ORG_NAME        = "Lumiere"
 QGC_ORG_DOMAIN      = "org.cubepilot"
 QGC_ANDROID_PACKAGE = "org.lumiere.herelink_qgroundcontrol"
