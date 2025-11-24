@@ -641,7 +641,10 @@ VideoManager::_initVideo()
         qCDebug(VideoManagerLog) << "video receiver disabled";
     }
 
-    widget = root->findChild<QQuickItem*>("thermalVideo");
+    widget = root->findChild<QQuickItem*>("thermalVideoPip");
+    if (widget == nullptr) {
+        widget = root->findChild<QQuickItem*>("thermalVideo");
+    }
 
     if (widget != nullptr && _videoReceiver[1] != nullptr) {
         _videoSink[1] = qgcApp()->toolbox()->corePlugin()->createVideoSink(this, widget);

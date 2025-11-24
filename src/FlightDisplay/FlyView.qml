@@ -162,17 +162,85 @@ Item {
         id: videoControl
     }
 
+    Item {
+        id: thermalPipControl
+        property Item pipState: thermalPipState
+
+        QGCPipState {
+            id:         thermalPipState
+            pipOverlay: _pipOverlay
+            isDark:     true
+        }
+
+        property bool _thermalStreaming: false
+        property bool _thermalDecoding:  false
+
+        // Track thermal video receiver state so we can show the waiting screen when needed
+        Connections {
+            target: QGroundControl.videoManager.thermalVideoReceiver
+
+            function onStreamingChanged(active) {
+                thermalPipControl._thermalStreaming = active
+            }
+
+            function onDecodingChanged(active) {
+                thermalPipControl._thermalDecoding = active
+            }
+        }
+
+        anchors.fill: parent
+
+        // Waiting screen for HDMI2 thermal feed
+        Item {
+            anchors.fill: parent
+            visible: !thermalPipControl._thermalStreaming && !thermalPipControl._thermalDecoding
+
+            Image {
+                anchors.fill:   parent
+                source:         "/res/NoVideoBackground.jpg"
+                fillMode:       Image.PreserveAspectCrop
+
+                Rectangle {
+                    anchors.centerIn:   parent
+                    width:              waitingLabel.contentWidth + ScreenTools.defaultFontPixelHeight
+                    height:             waitingLabel.contentHeight + ScreenTools.defaultFontPixelHeight
+                    radius:             ScreenTools.defaultFontPixelWidth / 2
+                    color:              "black"
+                    opacity:            0.5
+                }
+
+                QGCLabel {
+                    id:                 waitingLabel
+                    text:               qsTr("WAITING FOR VIDEO")
+                    font.family:        ScreenTools.demiboldFontFamily
+                    color:              "white"
+                    font.pointSize:     ScreenTools.smallFontPointSize
+                    anchors.centerIn:   parent
+                }
+            }
+        }
+
+        QGCVideoBackground {
+            id:             thermalVideoPip
+            anchors.fill:   parent
+            objectName:     "thermalVideoPip"
+            receiver:       QGroundControl.videoManager.thermalVideoReceiver
+            visible:        thermalPipControl._thermalDecoding || thermalPipControl._thermalStreaming
+        }
+    }
+
     QGCPipOverlay {
         id:                     _pipOverlay
         anchors.left:           parent.left
         anchors.bottom:         parent.bottom
         anchors.margins:        _toolsMargin
+        property var            _pipContent: QGroundControl.videoManager.hasThermal ? thermalPipControl : (QGroundControl.videoManager.hasVideo ? videoControl : null)
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
         item1:                  mapControl
-        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
+        item2:                  _pipContent
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
-        show:                   !QGroundControl.videoManager.fullScreen &&
-                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
+        show:                   !QGroundControl.videoManager.fullScreen && _pipContent &&
+                                    (_pipContent.pipState.state === _pipContent.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
     }
 }
