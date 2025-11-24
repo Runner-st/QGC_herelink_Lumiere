@@ -40,8 +40,8 @@ Item {
         Component.onCompleted:  start()
     }
 
-    property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
-    property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
+    property bool   _mainWindowIsMap:       false
+    property bool   _isFullWindowItemDark:  true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property var    _missionController:     _planController.missionController
     property var    _geoFenceController:    _planController.geoFenceController
@@ -153,13 +153,81 @@ Item {
         id:                     mapControl
         planMasterController:   _planController
         rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        pipMode:                !_mainWindowIsMap
+        pipMode:                false
         toolInsets:             customOverlay.totalToolInsets
         mapName:                "FlightDisplayView"
+        visible:                false
     }
 
     FlyViewVideo {
         id: videoControl
+    }
+
+    Item {
+        id: thermalPipControl
+        property Item pipState: thermalPipState
+
+        QGCPipState {
+            id:         thermalPipState
+            pipOverlay: _pipOverlay
+            isDark:     true
+        }
+
+        property bool _thermalStreaming: false
+        property bool _thermalDecoding:  false
+
+        // Track thermal video receiver state so we can show the waiting screen when needed
+        Connections {
+            target: QGroundControl.videoManager.thermalVideoReceiver
+
+            function onStreamingChanged(active) {
+                thermalPipControl._thermalStreaming = active
+            }
+
+            function onDecodingChanged(active) {
+                thermalPipControl._thermalDecoding = active
+            }
+        }
+
+        anchors.fill: parent
+
+        // Waiting screen for HDMI2 thermal feed
+        Item {
+            anchors.fill: parent
+            visible: !thermalPipControl._thermalStreaming && !thermalPipControl._thermalDecoding
+
+            Image {
+                anchors.fill:   parent
+                source:         "/res/NoVideoBackground.jpg"
+                fillMode:       Image.PreserveAspectCrop
+
+                Rectangle {
+                    anchors.centerIn:   parent
+                    width:              waitingLabel.contentWidth + ScreenTools.defaultFontPixelHeight
+                    height:             waitingLabel.contentHeight + ScreenTools.defaultFontPixelHeight
+                    radius:             ScreenTools.defaultFontPixelWidth / 2
+                    color:              "black"
+                    opacity:            0.5
+                }
+
+                QGCLabel {
+                    id:                 waitingLabel
+                    text:               qsTr("WAITING FOR VIDEO")
+                    font.family:        ScreenTools.demiboldFontFamily
+                    color:              "white"
+                    font.pointSize:     ScreenTools.smallFontPointSize
+                    anchors.centerIn:   parent
+                }
+            }
+        }
+
+        QGCVideoBackground {
+            id:             thermalVideoPip
+            anchors.fill:   parent
+            objectName:     "thermalVideoPip"
+            receiver:       QGroundControl.videoManager.thermalVideoReceiver
+            visible:        thermalPipControl._thermalDecoding || thermalPipControl._thermalStreaming
+        }
     }
 
     QGCPipOverlay {
@@ -167,12 +235,12 @@ Item {
         anchors.left:           parent.left
         anchors.bottom:         parent.bottom
         anchors.margins:        _toolsMargin
-        item1IsFullSettingsKey: "MainFlyWindowIsMap"
-        item1:                  mapControl
-        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
+        item1IsFullSettingsKey: "MainFlyWindowIsPrimaryVideo"
+        item1:                  videoControl
+        item2:                  thermalPipControl
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
         show:                   !QGroundControl.videoManager.fullScreen &&
-                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
+                                    (thermalPipControl.pipState.state === thermalPipControl.pipState.pipState || videoControl.pipState.state === videoControl.pipState.pipState)
     }
 }
