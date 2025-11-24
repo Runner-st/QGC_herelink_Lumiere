@@ -40,8 +40,8 @@ Item {
         Component.onCompleted:  start()
     }
 
-    property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
-    property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
+    property bool   _mainWindowIsMap:       false
+    property bool   _isFullWindowItemDark:  true
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property var    _missionController:     _planController.missionController
     property var    _geoFenceController:    _planController.geoFenceController
@@ -153,9 +153,10 @@ Item {
         id:                     mapControl
         planMasterController:   _planController
         rightPanelWidth:        ScreenTools.defaultFontPixelHeight * 9
-        pipMode:                !_mainWindowIsMap
+        pipMode:                false
         toolInsets:             customOverlay.totalToolInsets
         mapName:                "FlightDisplayView"
+        visible:                false
     }
 
     FlyViewVideo {
@@ -234,13 +235,12 @@ Item {
         anchors.left:           parent.left
         anchors.bottom:         parent.bottom
         anchors.margins:        _toolsMargin
-        property var            _pipContent: QGroundControl.videoManager.hasThermal ? thermalPipControl : (QGroundControl.videoManager.hasVideo ? videoControl : null)
-        item1IsFullSettingsKey: "MainFlyWindowIsMap"
-        item1:                  mapControl
-        item2:                  _pipContent
+        item1IsFullSettingsKey: "MainFlyWindowIsPrimaryVideo"
+        item1:                  videoControl
+        item2:                  thermalPipControl
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
-        show:                   !QGroundControl.videoManager.fullScreen && _pipContent &&
-                                    (_pipContent.pipState.state === _pipContent.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
+        show:                   !QGroundControl.videoManager.fullScreen &&
+                                    (thermalPipControl.pipState.state === thermalPipControl.pipState.pipState || videoControl.pipState.state === videoControl.pipState.pipState)
     }
 }
