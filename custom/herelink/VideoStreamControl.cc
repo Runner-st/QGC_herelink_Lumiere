@@ -102,15 +102,31 @@ void VideoStreamControl::_startVideoStreaming() {
     if (_linkInterface == NULL) {
         return;
     }
-    qCDebug(VideoStreamControlLog) << "Start Video Stream" << _systemId;
-    mavlink_message_t msg;
-    mavlink_msg_command_long_pack(_mavlinkProtocol->getSystemId(), _mavlinkProtocol->getComponentId(), &msg,
-                                      _systemId, MAV_COMP_ID_CAMERA,
-                                      MAV_CMD_VIDEO_START_STREAMING, 0, _cameraIdSetting, 0, 0, 0, 0, 0, 0);
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-    int len = mavlink_msg_to_send_buffer(buffer, &msg);
 
-    _linkInterface->writeBytesThreadSafe((const char*)buffer, len);
+    auto sendStartStream = [this](uint32_t cameraId) {
+        qCDebug(VideoStreamControlLog) << "Start Video Stream" << _systemId << "camera" << cameraId;
+        mavlink_message_t msg;
+        mavlink_msg_command_long_pack(_mavlinkProtocol->getSystemId(), _mavlinkProtocol->getComponentId(), &msg,
+                                      _systemId, MAV_COMP_ID_CAMERA,
+                                      MAV_CMD_VIDEO_START_STREAMING, 0, cameraId, 0, 0, 0, 0, 0, 0);
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        int len = mavlink_msg_to_send_buffer(buffer, &msg);
+
+        _linkInterface->writeBytesThreadSafe((const char*)buffer, len);
+    };
+
+    // Always start the configured camera and then request any additional cameras to stream
+    // so both HDMI inputs publish concurrently when available.
+    sendStartStream(_cameraIdSetting);
+
+    if (_cameraCount > 1) {
+        for (uint32_t cameraIndex = 0; cameraIndex < _cameraCount; ++cameraIndex) {
+            if (cameraIndex == _cameraIdSetting) {
+                continue;
+            }
+            sendStartStream(cameraIndex);
+        }
+    }
 
     emit videoNeedsReset();
 }
