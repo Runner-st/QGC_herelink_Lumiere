@@ -142,6 +142,15 @@ Rectangle {
         }
     }
 
+    function toggleHerelinkHdmiSource() {
+        if (!QGroundControl.corePlugin.isHerelink || !_videoStreamSettings) {
+            return
+        }
+
+        var nextCameraId = _videoStreamSettings.cameraId.rawValue === 0 ? 1 : 0
+        _videoStreamSettings.cameraId.rawValue = nextCameraId
+    }
+
     Timer {
         id:             simplePhotoCaptureTimer
         interval:       500
@@ -167,6 +176,16 @@ Rectangle {
             fillItem:   parent
             onClicked:  settingsDialogComponent.createObject(mainWindow).open()
         }
+    }
+
+    QGCButton {
+        anchors.margins:        _margins
+        anchors.right:          parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
+        text:                   qsTr("Switch Video")
+        enabled:                !QGroundControl.videoManager.videoStreamControl.settingInProgress
+        onClicked:              toggleHerelinkHdmiSource()
     }
 
     ColumnLayout {
