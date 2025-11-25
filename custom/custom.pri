@@ -20,7 +20,7 @@ win32 {
 } else {
     CUSTOM_QGC_VER_BUILD = $$system("echo $(($$CUSTOM_QGC_VER_BUILD - $$CUSTOM_QGC_VER_FIRST_BUILD))")
 }
-CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1011
+CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1012
 
 DEFINES -= APP_VERSION_STR=\"\\\"$$APP_VERSION_STR\\\"\"
 DEFINES += APP_VERSION_STR=\"\\\"$$CUSTOM_QGC_VERSION\\\"\"
@@ -32,8 +32,8 @@ message(Custom QGC Version: $${CUSTOM_QGC_VERSION})
 DEFINES += CUSTOMHEADER=\"\\\"HerelinkCorePlugin.h\\\"\"
 DEFINES += CUSTOMCLASS=HerelinkCorePlugin
 
-TARGET   = Lumiere-Herelink-QGroundControl
-DEFINES += QGC_APPLICATION_NAME='"\\\"Herelink QGroundControl\\\""'
+TARGET   = Lumiere-Herelink-QGC
+DEFINES += QGC_APPLICATION_NAME='"\\\"Lumiere QGroundControl\\\""'
 
 DEFINES += QGC_ORG_NAME=\"\\\"cubepilot.org\\\"\"
 DEFINES += QGC_ORG_DOMAIN=\"\\\"org.cubepilot\\\"\"
