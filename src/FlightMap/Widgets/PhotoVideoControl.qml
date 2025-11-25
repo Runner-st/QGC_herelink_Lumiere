@@ -24,7 +24,8 @@ import QGroundControl.FactSystem        1.0
 import QGroundControl.FactControls      1.0
 
 Rectangle {
-    height:     settingsButton.height + hdmiToggleButton.height + mainLayout.height + (_margins * 5)
+    // height:     settingsButton.height + hdmiToggleButton.height + mainLayout.height + (_margins * 5)
+    height:     hdmiToggleButton.height + mainLayout.height + (_margins * 5)
     color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
     radius:     _margins
     visible:    (_mavlinkCamera || _videoStreamAvailable || _simpleCameraAvailable) && multiVehiclePanelSelector.showSingleVehiclePanel
@@ -196,7 +197,7 @@ Rectangle {
         id:                         mainLayout
         anchors.margins:            _margins
         anchors.top:                hdmiToggleButton.bottom
-        anchors.topMargin:          _margins + 15
+        anchors.topMargin:          _margins + 30
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
 
