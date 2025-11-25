@@ -162,7 +162,7 @@ Rectangle {
     QGCColoredImage {
         id:                 settingsButton
         anchors.margins:    _margins
-        anchors.top:        parent.top
+        anchors.bottom:     parent.bottom
         anchors.right:      parent.right
         source:             "/res/gear-black.svg"
         mipmap:             true
@@ -182,8 +182,8 @@ Rectangle {
     QGCButton {
         id:                     hdmiToggleButton
         anchors.margins:        _margins
-        anchors.right:          parent.right
-        anchors.top:            settingsButton.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top:            parent.top
         anchors.topMargin:      _margins
         visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
         text:                   qsTr("Switch Video")
@@ -195,7 +195,7 @@ Rectangle {
         id:                         mainLayout
         anchors.margins:            _margins
         anchors.top:                hdmiToggleButton.bottom
-        anchors.topMargin:          _margins
+        anchors.topMargin:          _margins + 5
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
 
@@ -390,29 +390,29 @@ Rectangle {
             ColumnLayout {
                 spacing: _margins
 
-                GridLayout {
-                    Layout.margins: ScreenTools.defaultFontPixelWidth
-                    columns:        3
-                    visible:        QGroundControl.corePlugin.isHerelink
+                // GridLayout {
+                //     Layout.margins: ScreenTools.defaultFontPixelWidth
+                //     columns:        3
+                //     visible:        QGroundControl.corePlugin.isHerelink
 
-                    QGCLabel {
-                        text:               qsTr("video source used: HDMI ") + (_videoStreamSettings.cameraId.rawValue + 1)
-                        Layout.columnSpan:  3
-                    }
-                    QGCLabel {
-                        text:               qsTr("Select: ")
-                    }
-                    QGCButton {
-                        text:               qsTr("HDMI 1")
-                        enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
-                        onClicked:          _videoStreamSettings.cameraId.rawValue = 0
-                    }
-                    QGCButton {
-                        text:               qsTr("HDMI 2")
-                        enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
-                        onClicked:          _videoStreamSettings.cameraId.rawValue = 1
-                    }
-                }
+                //     QGCLabel {
+                //         text:               qsTr("video source used: HDMI ") + (_videoStreamSettings.cameraId.rawValue + 1)
+                //         Layout.columnSpan:  3
+                //     }
+                //     QGCLabel {
+                //         text:               qsTr("Select: ")
+                //     }
+                //     QGCButton {
+                //         text:               qsTr("HDMI 1")
+                //         enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
+                //         onClicked:          _videoStreamSettings.cameraId.rawValue = 0
+                //     }
+                //     QGCButton {
+                //         text:               qsTr("HDMI 2")
+                //         enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
+                //         onClicked:          _videoStreamSettings.cameraId.rawValue = 1
+                //     }
+                // }
                 GridLayout {
                     id:     gridLayout
                     flow:   GridLayout.TopToBottom
