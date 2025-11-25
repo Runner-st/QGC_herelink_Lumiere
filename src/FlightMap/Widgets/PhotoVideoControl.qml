@@ -49,6 +49,7 @@ Rectangle {
     property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
     property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
     property bool   _videoStreamInPhotoMode:                    false
+    property string _currentHdmiLabel:                          !_videoStreamSettings ? "" : (_videoStreamSettings.cameraId.rawValue === 0 ? qsTr("HDMI1") : qsTr("HDMI2"))
 
     // The following properties relate to a mavlink protocol camera
     property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
@@ -186,7 +187,7 @@ Rectangle {
         anchors.top:            parent.top
         anchors.topMargin:      _margins
         visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
-        text:                   qsTr("Switch Video")
+        text:                   _currentHdmiLabel === "" ? qsTr("Switch Video") : qsTr("Switch Video (%1)").arg(_currentHdmiLabel)
         enabled:                !QGroundControl.videoManager.videoStreamControl.settingInProgress
         onClicked:              toggleHerelinkHdmiSource()
     }
@@ -195,7 +196,7 @@ Rectangle {
         id:                         mainLayout
         anchors.margins:            _margins
         anchors.top:                hdmiToggleButton.bottom
-        anchors.topMargin:          _margins + 5
+        anchors.topMargin:          _margins + 10
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
 
@@ -285,6 +286,7 @@ Rectangle {
         // using the unified properties/functions.
         Rectangle {
             Layout.alignment:   Qt.AlignHCenter
+            Layout.topMargin:   _margins
             color:              Qt.rgba(0,0,0,0)
             width:              ScreenTools.defaultFontPixelWidth * 6
             height:             width
