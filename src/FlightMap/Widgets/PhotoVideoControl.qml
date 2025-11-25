@@ -24,7 +24,7 @@ import QGroundControl.FactSystem        1.0
 import QGroundControl.FactControls      1.0
 
 Rectangle {
-    height:     mainLayout.height + (_margins * 2)
+    height:     settingsButton.height + hdmiToggleButton.height + mainLayout.height + (_margins * 5)
     color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
     radius:     _margins
     visible:    (_mavlinkCamera || _videoStreamAvailable || _simpleCameraAvailable) && multiVehiclePanelSelector.showSingleVehiclePanel
@@ -49,6 +49,7 @@ Rectangle {
     property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
     property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
     property bool   _videoStreamInPhotoMode:                    false
+    property string _currentHdmiLabel:                          _videoStreamSettings && _videoStreamSettings.cameraId.rawValue === 0 ? qsTr("HDMI1") : qsTr("HDMI2")
 
     // The following properties relate to a mavlink protocol camera
     property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
@@ -142,6 +143,15 @@ Rectangle {
         }
     }
 
+    function toggleHerelinkHdmiSource() {
+        if (!QGroundControl.corePlugin.isHerelink || !_videoStreamSettings) {
+            return
+        }
+
+        var nextCameraId = _videoStreamSettings.cameraId.rawValue === 0 ? 1 : 0
+        _videoStreamSettings.cameraId.rawValue = nextCameraId
+    }
+
     Timer {
         id:             simplePhotoCaptureTimer
         interval:       500
@@ -151,9 +161,10 @@ Rectangle {
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     QGCColoredImage {
+        id:                 settingsButton
         anchors.margins:    _margins
-        anchors.top:        parent.top
         anchors.right:      parent.right
+        anchors.verticalCenter: parent.verticalCenter
         source:             "/res/gear-black.svg"
         mipmap:             true
         height:             ScreenTools.defaultFontPixelHeight
@@ -169,10 +180,23 @@ Rectangle {
         }
     }
 
+    QGCButton {
+        id:                     hdmiToggleButton
+        anchors.margins:        _margins
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top:            parent.top
+        anchors.topMargin:      _margins
+        visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
+        text:                   _currentHdmiLabel
+        enabled:                !QGroundControl.videoManager.videoStreamControl.settingInProgress
+        onClicked:              toggleHerelinkHdmiSource()
+    }
+
     ColumnLayout {
         id:                         mainLayout
         anchors.margins:            _margins
-        anchors.top:                parent.top
+        anchors.top:                hdmiToggleButton.bottom
+        anchors.topMargin:          _margins + 15
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
 
@@ -262,6 +286,7 @@ Rectangle {
         // using the unified properties/functions.
         Rectangle {
             Layout.alignment:   Qt.AlignHCenter
+            Layout.topMargin:   _margins
             color:              Qt.rgba(0,0,0,0)
             width:              ScreenTools.defaultFontPixelWidth * 6
             height:             width
@@ -367,29 +392,29 @@ Rectangle {
             ColumnLayout {
                 spacing: _margins
 
-                GridLayout {
-                    Layout.margins: ScreenTools.defaultFontPixelWidth
-                    columns:        3
-                    visible:        QGroundControl.corePlugin.isHerelink
+                // GridLayout {
+                //     Layout.margins: ScreenTools.defaultFontPixelWidth
+                //     columns:        3
+                //     visible:        QGroundControl.corePlugin.isHerelink
 
-                    QGCLabel {
-                        text:               qsTr("video source used: HDMI ") + (_videoStreamSettings.cameraId.rawValue + 1)
-                        Layout.columnSpan:  3
-                    }
-                    QGCLabel {
-                        text:               qsTr("Select: ")
-                    }
-                    QGCButton {
-                        text:               qsTr("HDMI 1")
-                        enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
-                        onClicked:          _videoStreamSettings.cameraId.rawValue = 0
-                    }
-                    QGCButton {
-                        text:               qsTr("HDMI 2")
-                        enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
-                        onClicked:          _videoStreamSettings.cameraId.rawValue = 1
-                    }
-                }
+                //     QGCLabel {
+                //         text:               qsTr("video source used: HDMI ") + (_videoStreamSettings.cameraId.rawValue + 1)
+                //         Layout.columnSpan:  3
+                //     }
+                //     QGCLabel {
+                //         text:               qsTr("Select: ")
+                //     }
+                //     QGCButton {
+                //         text:               qsTr("HDMI 1")
+                //         enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
+                //         onClicked:          _videoStreamSettings.cameraId.rawValue = 0
+                //     }
+                //     QGCButton {
+                //         text:               qsTr("HDMI 2")
+                //         enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
+                //         onClicked:          _videoStreamSettings.cameraId.rawValue = 1
+                //     }
+                // }
                 GridLayout {
                     id:     gridLayout
                     flow:   GridLayout.TopToBottom
