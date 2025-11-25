@@ -5,7 +5,7 @@ message("Adding Custom Herelink Plugin")
 
 CUSTOM_QGC_VER_MAJOR = 4
 CUSTOM_QGC_VER_MINOR = 4
-CUSTOM_QGC_VER_PATCH = 2
+CUSTOM_QGC_VER_PATCH = 3
 CUSTOM_QGC_VER_FIRST_BUILD = 0
 
 linux {
@@ -20,7 +20,7 @@ win32 {
 } else {
     CUSTOM_QGC_VER_BUILD = $$system("echo $(($$CUSTOM_QGC_VER_BUILD - $$CUSTOM_QGC_VER_FIRST_BUILD))")
 }
-CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.$${CUSTOM_QGC_VER_BUILD}
+CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1011
 
 DEFINES -= APP_VERSION_STR=\"\\\"$$APP_VERSION_STR\\\"\"
 DEFINES += APP_VERSION_STR=\"\\\"$$CUSTOM_QGC_VERSION\\\"\"
@@ -32,18 +32,18 @@ message(Custom QGC Version: $${CUSTOM_QGC_VERSION})
 DEFINES += CUSTOMHEADER=\"\\\"HerelinkCorePlugin.h\\\"\"
 DEFINES += CUSTOMCLASS=HerelinkCorePlugin
 
-TARGET   = Herelink-QGroundControl
+TARGET   = Lumiere-Herelink-QGroundControl
 DEFINES += QGC_APPLICATION_NAME='"\\\"Herelink QGroundControl\\\""'
 
 DEFINES += QGC_ORG_NAME=\"\\\"cubepilot.org\\\"\"
 DEFINES += QGC_ORG_DOMAIN=\"\\\"org.cubepilot\\\"\"
 
-QGC_APP_NAME        = "Herelink QGroundControl"
-QGC_BINARY_NAME     = "Herelink-QGroundControl"
-QGC_ORG_NAME        = "Cubepilot"
+QGC_APP_NAME        = "Lumiere Herelink QGC"
+QGC_BINARY_NAME     = "Lumiere Herelink QGC"
+QGC_ORG_NAME        = "Lumiere"
 QGC_ORG_DOMAIN      = "org.cubepilot"
 QGC_ANDROID_PACKAGE = "org.cubepilot.herelink_qgroundcontrol"
-QGC_APP_DESCRIPTION = "Herelink QGroundControl"
+QGC_APP_DESCRIPTION = "Lumiere Herelink QGC"
 QGC_APP_COPYRIGHT   = "Copyright (C) 2024 Cubepilot. All rights reserved."
 
 # Remove code which the Herelink doesn't need
