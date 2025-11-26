@@ -48,6 +48,8 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property alias  _gripperMenu:           gripperOptions
 
+    property real servoBottomInset: 0
+
     QGCToolInsets {
         id:                     _totalToolInsets
         leftEdgeTopInset:       toolStrip.leftEdgeTopInset
@@ -59,7 +61,10 @@ Item {
         topEdgeLeftInset:       toolStrip.topEdgeLeftInset
         topEdgeCenterInset:     mapScale.topEdgeCenterInset
         topEdgeRightInset:      instrumentPanel.topEdgeRightInset
-        bottomEdgeLeftInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
+        bottomEdgeLeftInset: {
+            var inset = virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
+            return Math.max(inset, servoBottomInset)
+        }
         bottomEdgeCenterInset:  telemetryPanel.bottomEdgeCenterInset
         bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : parentToolInsets.bottomEdgeRightInset
     }
@@ -144,6 +149,7 @@ Item {
         id:                 telemetryPanel
         x:                  recalcXPosition()
         anchors.margins:    _toolsMargin
+        bottomMode:         false
 
         property real bottomEdgeCenterInset: 0
         property real rightEdgeCenterInset: 0
@@ -176,8 +182,8 @@ Item {
 
                 AnchorChanges {
                     target: telemetryPanel
-                    anchors.top: photoVideoControl.bottom
-                    anchors.bottom: undefined
+                    anchors.top: undefined
+                    anchors.bottom: photoVideoControl.top
                     anchors.right: parent.right
                     anchors.verticalCenter: undefined
                 }

@@ -49,6 +49,8 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property alias  _gripperMenu:           gripperOptions
 
+    property real servoBottomInset: servoControlBar.visible ? (_root.height - servoControlBar.y) : 0
+
     QGCToolInsets {
         id:                     _totalToolInsets
         leftEdgeTopInset:       toolStrip.leftEdgeTopInset
@@ -60,7 +62,10 @@ Item {
         topEdgeLeftInset:       toolStrip.topEdgeLeftInset
         topEdgeCenterInset:     mapScale.topEdgeCenterInset
         topEdgeRightInset:      instrumentPanel.topEdgeRightInset
-        bottomEdgeLeftInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
+        bottomEdgeLeftInset: {
+            var inset = virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
+            return Math.max(inset, servoBottomInset)
+        }
         bottomEdgeCenterInset:  telemetryPanel.bottomEdgeCenterInset
         bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : parentToolInsets.bottomEdgeRightInset
     }
@@ -145,6 +150,7 @@ Item {
         id:                 telemetryPanel
         x:                  recalcXPosition()
         anchors.margins:    _toolsMargin
+        bottomMode:         false
 
         property real bottomEdgeCenterInset: 0
         property real rightEdgeCenterInset: 0
@@ -177,14 +183,14 @@ Item {
 
                 AnchorChanges {
                     target: telemetryPanel
-                    anchors.top: photoVideoControl.bottom
-                    anchors.bottom: undefined
-                    anchors.right: parent.right
+                    anchors.top: undefined
+                    anchors.bottom: parent.bottom
+                    anchors.right: photoVideoControl.left
                     anchors.verticalCenter: undefined
                 }
                 PropertyChanges {
                     target: telemetryPanel
-                    bottomEdgeCenterInset: 0
+                    bottomEdgeCenterInset: visible ? parent.height-y : 0
                     rightEdgeCenterInset: visible ? parent.width - x : 0
                 }
             },
@@ -196,13 +202,13 @@ Item {
                 AnchorChanges {
                     target: telemetryPanel
                     anchors.top: undefined
-                    anchors.bottom: undefined
+                    anchors.bottom: parent.bottom
                     anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenter: undefined
                 }
                 PropertyChanges {
                     target: telemetryPanel
-                    bottomEdgeCenterInset: 0
+                    bottomEdgeCenterInset: visible ? parent.height-y : 0
                     rightEdgeCenterInset: visible ? parent.width - x : 0
                 }
             }
@@ -253,26 +259,27 @@ Item {
         id:                     servoControlBar
         anchors.left:           parent.left
         anchors.bottom:         parent.bottom
-        anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeBottomInset
-        anchors.bottomMargin:   _toolsMargin + parentToolInsets.bottomEdgeLeftInset
+        anchors.leftMargin:     _toolsMargin
+        anchors.bottomMargin:   _toolsMargin
         visible:                _servoController && _servoController.buttons.length > 0
-        width:                  servoControlBackground.implicitWidth
-        height:                 servoControlBackground.implicitHeight
+        property real padding:  ScreenTools.defaultFontPixelHeight * 0.5
+
+        width:                  servoControlRow.implicitWidth + (padding * 2)
+        height:                 servoControlRow.implicitHeight + (padding * 2)
         z:                      QGroundControl.zOrderWidgets
 
         Rectangle {
             id: servoControlBackground
+            anchors.fill: parent
             radius: ScreenTools.defaultFontPixelHeight * 0.6
             color: Qt.rgba(0, 0, 0, 0.55)
-            implicitWidth: servoControlRow.implicitWidth + ScreenTools.defaultFontPixelHeight
-            implicitHeight: servoControlRow.implicitHeight + ScreenTools.defaultFontPixelHeight
-            width: implicitWidth
-            height: implicitHeight
         }
 
         Row {
             id:         servoControlRow
-            anchors.centerIn: servoControlBackground
+            anchors.left:   parent.left
+            anchors.leftMargin: servoControlBar.padding
+            anchors.verticalCenter: parent.verticalCenter
             spacing:    ScreenTools.defaultFontPixelWidth
 
             Repeater {
