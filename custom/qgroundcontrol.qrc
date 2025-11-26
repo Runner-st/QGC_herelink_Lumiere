@@ -29,9 +29,10 @@
 		<file alias="SubChecklist.qml">../src/FlightDisplay/SubChecklist.qml</file>
 	</qresource>
 	<qresource prefix="/qml">
-		<file alias="QGroundControl/Controls/HeightIndicator.qml">../src/QmlControls/HeightIndicator.qml</file>
-		<file alias="QGroundControl/Controls/QGCDynamicObjectManager.qml">../src/QmlControls/QGCDynamicObjectManager.qml</file>
-		<file alias="QGroundControl/Controls/QGCOptionsComboBox.qml">../src/QmlControls/QGCOptionsComboBox.qml</file>
+                <file alias="QGroundControl/Controls/HeightIndicator.qml">../src/QmlControls/HeightIndicator.qml</file>
+                <file alias="QGroundControl/Controls/QGCDynamicObjectManager.qml">../src/QmlControls/QGCDynamicObjectManager.qml</file>
+                <file alias="QGroundControl/Settings/SettingsPagesModel.qml">res/Settings/SettingsPagesModel.qml</file>
+                <file alias="QGroundControl/Controls/QGCOptionsComboBox.qml">../src/QmlControls/QGCOptionsComboBox.qml</file>
 		<file alias="QGroundControl/Controls/TransectStyleMapVisuals.qml">../src/PlanView/TransectStyleMapVisuals.qml</file>
 		<file alias="QGroundControl/FlightMap/MapLineArrow.qml">../src/MissionManager/MapLineArrow.qml</file>
 		<file alias="QGroundControl/FlightMap/SplitIndicator.qml">../src/FlightMap/MapItems/SplitIndicator.qml</file>
@@ -52,14 +53,15 @@
 		<file alias="GeoTagPage.qml">../src/AnalyzeView/GeoTagPage.qml</file>
 		<file alias="HelpSettings.qml">../src/ui/preferences/HelpSettings.qml</file>
 		<file alias="JoystickConfig.qml">../src/VehicleSetup/JoystickConfig.qml</file>
-		<file alias="JoystickConfigAdvanced.qml">../src/VehicleSetup/JoystickConfigAdvanced.qml</file>
-		<file alias="JoystickConfigButtons.qml">../src/VehicleSetup/JoystickConfigButtons.qml</file>
-		<file alias="JoystickConfigCalibration.qml">../src/VehicleSetup/JoystickConfigCalibration.qml</file>
-		<file alias="JoystickConfigGeneral.qml">../src/VehicleSetup/JoystickConfigGeneral.qml</file>
-		<file alias="LinkSettings.qml">../src/ui/preferences/LinkSettings.qml</file>
-		<file alias="LogDownloadPage.qml">../src/AnalyzeView/LogDownloadPage.qml</file>
-		<file alias="LogReplaySettings.qml">../src/ui/preferences/LogReplaySettings.qml</file>
-		<file alias="MainRootWindow.qml">../src/ui/MainRootWindow.qml</file>
+                <file alias="JoystickConfigAdvanced.qml">../src/VehicleSetup/JoystickConfigAdvanced.qml</file>
+                <file alias="JoystickConfigButtons.qml">../src/VehicleSetup/JoystickConfigButtons.qml</file>
+                <file alias="JoystickConfigCalibration.qml">../src/VehicleSetup/JoystickConfigCalibration.qml</file>
+                <file alias="JoystickConfigGeneral.qml">../src/VehicleSetup/JoystickConfigGeneral.qml</file>
+                <file alias="LinkSettings.qml">../src/ui/preferences/LinkSettings.qml</file>
+                <file alias="ServoControlSettings.qml">res/ServoControl/ServoControlSettings.qml</file>
+                <file alias="LogDownloadPage.qml">../src/AnalyzeView/LogDownloadPage.qml</file>
+                <file alias="LogReplaySettings.qml">../src/ui/preferences/LogReplaySettings.qml</file>
+                <file alias="MainRootWindow.qml">../src/ui/MainRootWindow.qml</file>
 		<file alias="MavlinkConsolePage.qml">../src/AnalyzeView/MavlinkConsolePage.qml</file>
 		<file alias="MAVLinkInspectorPage.qml">../src/AnalyzeView/MAVLinkInspectorPage.qml</file>
 		<file alias="MavlinkSettings.qml">../src/ui/preferences/MavlinkSettings.qml</file>
@@ -216,7 +218,7 @@
 		<file alias="QGroundControl/FlightDisplay/FlyViewToolStripActionList.qml">../src/FlightDisplay/FlyViewToolStripActionList.qml</file>
 		<file alias="QGroundControl/FlightDisplay/FlyViewVideo.qml">../src/FlightDisplay/FlyViewVideo.qml</file>
 		<file alias="QGroundControl/FlightDisplay/OnScreenGimbalController.qml">../src/FlightDisplay/OnScreenGimbalController.qml</file>
-		<file alias="QGroundControl/FlightDisplay/FlyViewWidgetLayer.qml">../src/FlightDisplay/FlyViewWidgetLayer.qml</file>
+                <file alias="QGroundControl/FlightDisplay/FlyViewWidgetLayer.qml">res/ServoControl/FlyViewWidgetLayer.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedActionActionList.qml">../src/FlightDisplay/GuidedActionActionList.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedActionConfirm.qml">../src/FlightDisplay/GuidedActionConfirm.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedActionsController.qml">../src/FlightDisplay/GuidedActionsController.qml</file>

@@ -9,8 +9,10 @@
 #include "JoystickManager.h"
 #include "HorizontalFactValueGrid.h"
 #include "InstrumentValueData.h"
+#include "QmlComponentInfo.h"
 
 #include <list>
+#include <QQmlEngine>
 
 QGC_LOGGING_CATEGORY(HerelinkCorePluginLog, "HerelinkCorePluginLog")
 
@@ -24,10 +26,68 @@ void HerelinkCorePlugin::setToolbox(QGCToolbox* toolbox)
 {
     QGCCorePlugin::setToolbox(toolbox);
 
+    qmlRegisterUncreatableType<ServoControlController>("QGroundControl.ServoControl", 1, 0, "ServoControlController", "Reference only");
+    qmlRegisterUncreatableType<ServoControlSettings>("QGroundControl.ServoControl", 1, 0, "ServoControlSettings", "Reference only");
+
     _herelinkOptions = new HerelinkOptions(this, nullptr);
+    _servoControlController = new ServoControlController(this);
 
     auto multiVehicleManager = qgcApp()->toolbox()->multiVehicleManager();
     connect(multiVehicleManager, &MultiVehicleManager::activeVehicleChanged, this, &HerelinkCorePlugin::_activeVehicleChanged);
+}
+
+QVariantList& HerelinkCorePlugin::settingsPages()
+{
+    if (!_settingsList.isEmpty()) {
+        return _settingsList;
+    }
+
+    _settingsGeneral = new QmlComponentInfo(tr("General"), QUrl::fromUserInput("qrc:/qml/GeneralSettings.qml"), QUrl::fromUserInput("qrc:/res/gear-white.svg"), this);
+    _settingsList.append(QVariant::fromValue(_settingsGeneral));
+
+    _settingsCommLinks = new QmlComponentInfo(tr("Comm Links"), QUrl::fromUserInput("qrc:/qml/LinkSettings.qml"), QUrl::fromUserInput("qrc:/res/waves.svg"), this);
+    _settingsList.append(QVariant::fromValue(_settingsCommLinks));
+
+    _settingsServoControl = new QmlComponentInfo(tr("Servo Control"), QUrl::fromUserInput("qrc:/qml/ServoControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
+    _settingsList.append(QVariant::fromValue(_settingsServoControl));
+
+    _settingsOfflineMaps = new QmlComponentInfo(tr("Offline Maps"), QUrl::fromUserInput("qrc:/qml/OfflineMap.qml"), QUrl::fromUserInput("qrc:/res/waves.svg"), this);
+    _settingsList.append(QVariant::fromValue(_settingsOfflineMaps));
+
+#if defined(QGC_GST_TAISYNC_ENABLED)
+    _settingsTaisync = new QmlComponentInfo(tr("Taisync"), QUrl::fromUserInput("qrc:/qml/TaisyncSettings.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsTaisync));
+#endif
+
+#if defined(QGC_GST_MICROHARD_ENABLED)
+    _settingsMicrohard = new QmlComponentInfo(tr("Microhard"), QUrl::fromUserInput("qrc:/qml/MicrohardSettings.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsMicrohard));
+#endif
+
+    _settingsMavlink = new QmlComponentInfo(tr("MAVLink"), QUrl::fromUserInput("qrc:/qml/MavlinkSettings.qml"), QUrl::fromUserInput("qrc:/res/waves.svg"), this);
+    _settingsList.append(QVariant::fromValue(_settingsMavlink));
+
+    _settingsRemoteId = new QmlComponentInfo(tr("Remote ID"), QUrl::fromUserInput("qrc:/qml/RemoteIDSettings.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsRemoteId));
+
+    _settingsConsole = new QmlComponentInfo(tr("Console"), QUrl::fromUserInput("qrc:/qml/QGroundControl/Controls/AppMessages.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsConsole));
+
+    _settingsHelp = new QmlComponentInfo(tr("Help"), QUrl::fromUserInput("qrc:/qml/HelpSettings.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsHelp));
+
+#if defined(QT_DEBUG)
+    _settingsMockLink = new QmlComponentInfo(tr("Mock Link"), QUrl::fromUserInput("qrc:/qml/MockLink.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsMockLink));
+
+    _settingsDebug = new QmlComponentInfo(tr("Debug"), QUrl::fromUserInput("qrc:/qml/DebugWindow.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsDebug));
+
+    _settingsPalette = new QmlComponentInfo(tr("Palette Test"), QUrl::fromUserInput("qrc:/qml/QmlTest.qml"), QUrl(), this);
+    _settingsList.append(QVariant::fromValue(_settingsPalette));
+#endif
+
+    return _settingsList;
 }
 
 bool HerelinkCorePlugin::overrideSettingsGroupVisibility(QString name)

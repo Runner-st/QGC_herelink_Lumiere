@@ -70,10 +70,14 @@ QML_IMPORT_PATH += \
 SOURCES += \
     $$PWD/src/HerelinkCorePlugin.cc \
     $$PWD/src/HerelinkOptions.cc \
+    $$PWD/src/ServoControlController.cc \
+    $$PWD/src/ServoControlSettings.cc \
 
 HEADERS += \
     $$PWD/src/HerelinkCorePlugin.h \
     $$PWD/src/HerelinkOptions.h \
+    $$PWD/src/ServoControlController.h \
+    $$PWD/src/ServoControlSettings.h \
 
 INCLUDEPATH += \
     $$PWD/src \
