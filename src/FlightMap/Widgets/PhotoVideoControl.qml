@@ -153,6 +153,18 @@ Rectangle {
         _videoStreamSettings.cameraId.rawValue = nextCameraId
     }
 
+    function sendCameraCommand(command, param1) {
+        if (!_activeVehicle) {
+            return
+        }
+
+        _activeVehicle.sendMavCommand(
+                    _activeVehicle.defaultComponentId,
+                    command,
+                    true,
+                    param1 ? param1 : 0)
+    }
+
     Timer {
         id:             simplePhotoCaptureTimer
         interval:       500
@@ -193,10 +205,58 @@ Rectangle {
         onClicked:              toggleHerelinkHdmiSource()
     }
 
+    GridLayout {
+        id:                         customCameraControls
+        anchors.margins:            _margins
+        anchors.top:                hdmiToggleButton.bottom
+        anchors.topMargin:          _margins
+        anchors.horizontalCenter:   parent.horizontalCenter
+        columns:                    2
+        columnSpacing:              _margins
+        rowSpacing:                 _margins
+        visible:                    _activeVehicle
+
+        QGCButton {
+            Layout.fillWidth:   true
+            text:               qsTr("Zoom In")
+            onClicked:          sendCameraCommand(31001)
+        }
+
+        QGCButton {
+            Layout.fillWidth:   true
+            text:               qsTr("Zoom Out")
+            onClicked:          sendCameraCommand(31002)
+        }
+
+        QGCButton {
+            Layout.fillWidth:   true
+            text:               qsTr("Center (full)")
+            onClicked:          sendCameraCommand(31003)
+        }
+
+        QGCButton {
+            Layout.fillWidth:   true
+            text:               qsTr("Center tilt only")
+            onClicked:          sendCameraCommand(31004)
+        }
+
+        QGCButton {
+            Layout.fillWidth:   true
+            text:               qsTr("Set Day stream")
+            onClicked:          sendCameraCommand(31005, 1)
+        }
+
+        QGCButton {
+            Layout.fillWidth:   true
+            text:               qsTr("Set Thermal stream")
+            onClicked:          sendCameraCommand(31006, 2)
+        }
+    }
+
     ColumnLayout {
         id:                         mainLayout
         anchors.margins:            _margins
-        anchors.top:                hdmiToggleButton.bottom
+        anchors.top:                customCameraControls.visible ? customCameraControls.bottom : hdmiToggleButton.bottom
         anchors.topMargin:          _margins + 30
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
