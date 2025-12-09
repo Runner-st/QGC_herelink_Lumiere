@@ -230,25 +230,25 @@ Rectangle {
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Center (full)")
+            text:               qsTr("Center")
             onClicked:          sendCameraCommand(31003)
         }
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Center tilt only")
+            text:               qsTr("Tilt")
             onClicked:          sendCameraCommand(31004)
         }
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Set Day stream")
+            text:               qsTr("Day Cam")
             onClicked:          sendCameraCommand(31005, 1)
         }
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Set Thermal stream")
+            text:               qsTr("Thermal Cam")
             onClicked:          sendCameraCommand(31006, 2)
         }
     }
