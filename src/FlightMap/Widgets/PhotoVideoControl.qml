@@ -160,7 +160,7 @@ Rectangle {
             return
         }
 
-        _activeVehicle.sendMavCommand(
+        _activeVehicle.sendCommand(
                     _activeVehicle.defaultComponentId,
                     command,
                     true,
