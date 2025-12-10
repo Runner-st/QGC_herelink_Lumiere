@@ -220,13 +220,13 @@ Rectangle {
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Zoom In")
+            text:               qsTr("Zoom +")
             onClicked:          sendCameraCommand(31001)
         }
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Zoom Out")
+            text:               qsTr("Zoom -")
             onClicked:          sendCameraCommand(31002)
         }
 
@@ -244,13 +244,13 @@ Rectangle {
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Day Cam")
+            text:               qsTr("Day")
             onClicked:          sendCameraCommand(31005, 1)
         }
 
         QGCButton {
             Layout.fillWidth:   true
-            text:               qsTr("Thermal Cam")
+            text:               qsTr("Thermal")
             onClicked:          sendCameraCommand(31006, 2)
         }
     }
