@@ -160,15 +160,15 @@ Rectangle {
             return
         }
 
-        var compId = _activeVehicle.defaultComponentId
-        if (compId === 0) {
-            compId = 1
-        }
+        // These Herelink-specific commands are handled by the camera/gimbal component.
+        // Use MAV_COMP_ID_CAMERA (100) as the target and suppress error popups since the
+        // autopilot will not understand these vendor commands.
+        const compId = 100
 
         _activeVehicle.sendCommand(
                     compId,
                     command,
-                    true,
+                    false,
                     param1 ? param1 : 0)
     }
 
