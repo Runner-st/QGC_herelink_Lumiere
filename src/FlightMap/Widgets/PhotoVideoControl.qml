@@ -160,8 +160,13 @@ Rectangle {
             return
         }
 
+        var compId = _activeVehicle.defaultComponentId
+        if (compId === 0) {
+            compId = 1
+        }
+
         _activeVehicle.sendCommand(
-                    _activeVehicle.defaultComponentId,
+                    compId,
                     command,
                     true,
                     param1 ? param1 : 0)
