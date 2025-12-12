@@ -31,7 +31,14 @@ TARGET   = QGroundControl
 TEMPLATE = app
 QGCROOT  = $$PWD
 
+# QML import paths used by androiddeployqt/qmlimportscanner when packaging
+# the Android build. Point to the root of our QML modules and custom resources
+# so deployment picks up QGroundControl.* modules, Custom.Widgets and the
+# gstreamer video item plugin without warnings.
 QML_IMPORT_PATH += $$PWD/src/QmlControls
+QML_IMPORT_PATH += $$PWD/src
+QML_IMPORT_PATH += $$PWD/custom/res
+QML_IMPORT_PATH += $$PWD/libs/qmlglsink
 
 #
 # OS Specific settings
