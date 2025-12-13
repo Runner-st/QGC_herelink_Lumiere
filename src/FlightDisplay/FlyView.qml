@@ -172,7 +172,6 @@ Item {
         item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
-        // Map PiP is disabled for the main Fly View window
-        show:                   false
+        show:                   true
     }
 }
