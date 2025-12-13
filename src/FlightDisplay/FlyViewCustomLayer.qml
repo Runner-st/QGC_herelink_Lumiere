@@ -37,19 +37,19 @@ Item {
 
     property var _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
-    // Tool insets - inform the system about space used by our custom controls
+// Tool insets - inform the system about space used by our custom controls
     QGCToolInsets {
         id:                     _toolInsets
         leftEdgeTopInset:       parentToolInsets.leftEdgeTopInset
         leftEdgeCenterInset:    parentToolInsets.leftEdgeCenterInset
-        leftEdgeBottomInset:    c12CameraControl.visible ? c12CameraControl.height + ScreenTools.defaultFontPixelHeight * 3 : parentToolInsets.leftEdgeBottomInset
-        rightEdgeTopInset:      parentToolInsets.rightEdgeTopInset
+        leftEdgeBottomInset:    parentToolInsets.leftEdgeBottomInset
+        rightEdgeTopInset:      c12CameraControl.visible ? c12CameraControl.height + ScreenTools.defaultFontPixelHeight * 9 : parentToolInsets.rightEdgeTopInset
         rightEdgeCenterInset:   parentToolInsets.rightEdgeCenterInset
         rightEdgeBottomInset:   parentToolInsets.rightEdgeBottomInset
         topEdgeLeftInset:       parentToolInsets.topEdgeLeftInset
         topEdgeCenterInset:     parentToolInsets.topEdgeCenterInset
-        topEdgeRightInset:      parentToolInsets.topEdgeRightInset
-        bottomEdgeLeftInset:    c12CameraControl.visible ? c12CameraControl.width + ScreenTools.defaultFontPixelWidth * 2 : parentToolInsets.bottomEdgeLeftInset
+        topEdgeRightInset:      c12CameraControl.visible ? c12CameraControl.width + ScreenTools.defaultFontPixelWidth * 2 : parentToolInsets.topEdgeRightInset
+        bottomEdgeLeftInset:    parentToolInsets.bottomEdgeLeftInset
         bottomEdgeCenterInset:  parentToolInsets.bottomEdgeCenterInset
         bottomEdgeRightInset:   parentToolInsets.bottomEdgeRightInset
     }
@@ -59,22 +59,22 @@ Item {
         id: c12Controller
     }
 
-    // C12 Camera Control Panel
+// C12 Camera Control Panel
     Rectangle {
         id:             c12CameraControl
-        anchors.left:   parent.left
-        anchors.bottom: parent.bottom
-        anchors.leftMargin:     ScreenTools.defaultFontPixelWidth
-        anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 2
+        anchors.right:  parent.right          // Changed to right side
+        anchors.top:    parent.top            // Changed to top
+        anchors.rightMargin:    ScreenTools.defaultFontPixelWidth
+        anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 8  // Leave space for instruments
         
-        width:          mainLayout.width + (ScreenTools.defaultFontPixelWidth * 3)
-        height:         mainLayout.height + (ScreenTools.defaultFontPixelHeight * 2)
+        width:          mainLayout.width + (ScreenTools.defaultFontPixelWidth * 2)
+        height:         mainLayout.height + (ScreenTools.defaultFontPixelHeight * 1.5)
         
         radius:         ScreenTools.defaultFontPixelWidth * 0.5
         color:          qgcPal.window
         border.color:   qgcPal.text
         border.width:   1
-        opacity:        0.95
+        opacity:        0.75                   // More opaque (was 0.95)
         visible:        _activeVehicle
         
         property var qgcPal: QGroundControl.globalPalette
@@ -82,24 +82,7 @@ Item {
         ColumnLayout {
             id:                 mainLayout
             anchors.centerIn:   parent
-            spacing:            ScreenTools.defaultFontPixelHeight * 0.5
-
-            // Title
-            QGCLabel {
-                text:                   "C12 Camera"
-                font.pointSize:         ScreenTools.mediumFontPointSize
-                font.bold:              true
-                Layout.alignment:       Qt.AlignHCenter
-                color:                  qgcPal.text
-            }
-
-            // Separator line
-            Rectangle {
-                Layout.fillWidth:       true
-                Layout.preferredHeight: 1
-                color:                  qgcPal.text
-                opacity:                0.3
-            }
+            spacing:            ScreenTools.defaultFontPixelHeight * 0.3  // Tighter spacing
 
             // Center Controls Row
             RowLayout {
@@ -107,14 +90,14 @@ Item {
                 Layout.alignment:   Qt.AlignHCenter
 
                 QGCButton {
-                    text:                   "Center All"
+                    text:                   "Center"
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
                     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
                     onClicked:              c12Controller.centerCamera()
                 }
 
                 QGCButton {
-                    text:                   "Center Tilt"
+                    text:                   "Tilt"
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
                     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
                     onClicked:              c12Controller.centerTiltOnly()
@@ -137,7 +120,7 @@ Item {
                     
                     Timer {
                         id:         zoomOutTimer
-                        interval:   200  // Send command every 200ms while held
+                        interval:   200
                         repeat:     true
                         running:    parent.isHeld
                         onTriggered: c12Controller.zoomOut()
@@ -157,7 +140,7 @@ Item {
                     
                     Timer {
                         id:         zoomInTimer
-                        interval:   200  // Send command every 200ms while held
+                        interval:   200
                         repeat:     true
                         running:    parent.isHeld
                         onTriggered: c12Controller.zoomIn()
@@ -174,10 +157,9 @@ Item {
             hoverEnabled:           true
             propagateComposedEvents: true
             
-            onEntered: parent.opacity = 1.0
-            onExited:  parent.opacity = 0.95
+            onEntered: parent.opacity = 0.85
+            onExited:  parent.opacity = 0.75
             
-            // Allow clicks to pass through to buttons
             onPressed: mouse.accepted = false
         }
     }
