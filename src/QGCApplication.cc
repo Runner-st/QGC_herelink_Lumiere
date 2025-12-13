@@ -135,6 +135,7 @@
 #endif
 
 #include "QGCMapEngine.h"
+#include "Camera/CustomC12Controller.h"
 
 class FinishVideoInitialization : public QRunnable
 {
@@ -534,6 +535,7 @@ void QGCApplication::_initCommon()
 #if !defined(QGC_DISABLE_MAVLINK_INSPECTOR)
     qmlRegisterType<MAVLinkInspectorController>     (kQGCControllers,                       1, 0, "MAVLinkInspectorController");
 #endif
+    qmlRegisterType<CustomC12Controller>("QGroundControl.Controllers", 1, 0, "CustomC12Controller");
 
     // Register Qml Singletons
     qmlRegisterSingletonType<QGroundControlQmlGlobal>   ("QGroundControl",                          1, 0, "QGroundControl",         qgroundcontrolQmlGlobalSingletonFactory);

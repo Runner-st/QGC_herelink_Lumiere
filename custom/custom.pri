@@ -90,3 +90,30 @@ HEADERS += $$PWD/herelink/VideoStreamControl.h
 INCLUDEPATH += $$PWD/herelink
 
 # Custom versions of a Herelink build should only add changes below here to prevent conflicts
+
+################################################################################
+#
+# Custom Build Configuration for C12 Camera Controller
+#
+################################################################################
+
+message("Loading custom C12 Camera Controller configuration")
+
+# Include path for custom headers
+INCLUDEPATH += \
+    $$PWD/src \
+    $$PWD/src/Camera
+
+# C12 Camera Controller source files
+HEADERS += \
+    $$PWD/src/Camera/CustomC12Controller.h
+
+SOURCES += \
+    $$PWD/src/Camera/CustomC12Controller.cc
+
+# Ensure Qt Network module is included
+QT += network
+
+# Custom resources
+#RESOURCES += \
+#    $$PWD/custom.qrc
