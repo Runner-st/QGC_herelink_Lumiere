@@ -24,6 +24,7 @@ public:
     DEFINE_SETTINGFACT(udpPort)
     DEFINE_SETTINGFACT(tcpUrl)
     DEFINE_SETTINGFACT(rtspUrl)
+    DEFINE_SETTINGFACT(rtspUrl2)
     DEFINE_SETTINGFACT(aspectRatio)
     DEFINE_SETTINGFACT(videoFit)
     DEFINE_SETTINGFACT(gridLines)
@@ -38,6 +39,7 @@ public:
     DEFINE_SETTINGFACT(forceVideoDecoder)
     // Herelink HDMI source switching
     DEFINE_SETTINGFACT(cameraId)
+    DEFINE_SETTINGFACT(currentStream)
 
     enum VideoDecoderOptions {
         ForceVideoDecoderDefault = 0,

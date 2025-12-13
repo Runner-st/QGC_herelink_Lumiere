@@ -369,25 +369,32 @@ Rectangle {
 
                 GridLayout {
                     Layout.margins: ScreenTools.defaultFontPixelWidth
-                    columns:        3
+                    columns:        4
                     visible:        QGroundControl.corePlugin.isHerelink
 
+                    property var streamLabels: [qsTr("Stream1"), qsTr("Stream2"), qsTr("HDMI2")]
+
                     QGCLabel {
-                        text:               qsTr("video source used: HDMI ") + (_videoStreamSettings.cameraId.rawValue + 1)
-                        Layout.columnSpan:  3
+                        text:               qsTr("Video source: ") + streamLabels[_videoStreamSettings.currentStream.rawValue]
+                        Layout.columnSpan:  4
                     }
                     QGCLabel {
                         text:               qsTr("Select: ")
                     }
                     QGCButton {
-                        text:               qsTr("HDMI 1")
+                        text:               qsTr("Stream1")
                         enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
-                        onClicked:          _videoStreamSettings.cameraId.rawValue = 0
+                        onClicked:          _videoStreamSettings.currentStream.rawValue = 0
                     }
                     QGCButton {
-                        text:               qsTr("HDMI 2")
+                        text:               qsTr("Stream2")
                         enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
-                        onClicked:          _videoStreamSettings.cameraId.rawValue = 1
+                        onClicked:          _videoStreamSettings.currentStream.rawValue = 1
+                    }
+                    QGCButton {
+                        text:               qsTr("HDMI2")
+                        enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
+                        onClicked:          _videoStreamSettings.currentStream.rawValue = 2
                     }
                 }
                 GridLayout {

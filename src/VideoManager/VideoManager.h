@@ -139,8 +139,10 @@ protected slots:
     void _videoSourceChanged        ();
     void _udpPortChanged            ();
     void _rtspUrlChanged            ();
+    void _rtspUrl2Changed           ();
     void _tcpUrlChanged             ();
     void _lowLatencyModeChanged     ();
+    void _currentStreamChanged      ();
     void _updateUVC                 ();
     void _setActiveVehicle          (Vehicle* vehicle);
     void _aspectRatioChanged        ();

@@ -26,6 +26,13 @@
     "default":     ""
 },
 {
+    "name":             "rtspUrl2",
+    "shortDesc": "Video RTSP Url 2",
+    "longDesc":  "Second RTSP url address and port to bind to for video stream. Example: rtsp://192.168.42.2:554/live",
+    "type":             "string",
+    "default":     ""
+},
+{
     "name":             "tcpUrl",
     "shortDesc": "Video TCP Url",
     "longDesc":  "TCP url address and port to bind to for video stream. Example: 192.168.143.200:3001",
@@ -143,6 +150,13 @@
     "name":             "cameraId",
     "shortDesc":        "Camera ID",
     "longDesc":         "Camera ID used for video streaming.",
+    "type":             "uint32",
+    "default":          0
+},
+{
+    "name":             "currentStream",
+    "shortDesc":        "Current Stream Selection",
+    "longDesc":         "Current video stream selection: 0=Stream1 (RTSP URL 1), 1=Stream2 (RTSP URL 2), 2=HDMI2",
     "type":             "uint32",
     "default":          0
 }

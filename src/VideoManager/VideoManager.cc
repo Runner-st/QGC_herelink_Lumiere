@@ -101,9 +101,11 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
    connect(_videoSettings->videoSource(),   &Fact::rawValueChanged, this, &VideoManager::_videoSourceChanged);
    connect(_videoSettings->udpPort(),       &Fact::rawValueChanged, this, &VideoManager::_udpPortChanged);
    connect(_videoSettings->rtspUrl(),       &Fact::rawValueChanged, this, &VideoManager::_rtspUrlChanged);
+   connect(_videoSettings->rtspUrl2(),      &Fact::rawValueChanged, this, &VideoManager::_rtspUrl2Changed);
    connect(_videoSettings->tcpUrl(),        &Fact::rawValueChanged, this, &VideoManager::_tcpUrlChanged);
    connect(_videoSettings->aspectRatio(),   &Fact::rawValueChanged, this, &VideoManager::_aspectRatioChanged);
    connect(_videoSettings->lowLatencyMode(),&Fact::rawValueChanged, this, &VideoManager::_lowLatencyModeChanged);
+   connect(_videoSettings->currentStream(), &Fact::rawValueChanged, this, &VideoManager::_currentStreamChanged);
    MultiVehicleManager *pVehicleMgr = qgcApp()->toolbox()->multiVehicleManager();
    connect(pVehicleMgr, &MultiVehicleManager::activeVehicleChanged, this, &VideoManager::_setActiveVehicle);
 
@@ -534,6 +536,30 @@ VideoManager::_rtspUrlChanged()
 
 //-----------------------------------------------------------------------------
 void
+VideoManager::_rtspUrl2Changed()
+{
+    _restartVideo(0);
+}
+
+//-----------------------------------------------------------------------------
+void
+VideoManager::_currentStreamChanged()
+{
+    unsigned int currentStream = _videoSettings->currentStream()->rawValue().toUInt();
+    if (currentStream == 0 || currentStream == 1) {
+        // Switch to RTSP source for Stream1 or Stream2
+        _videoSettings->videoSource()->setRawValue(VideoSettings::videoSourceRTSP);
+    } else if (currentStream == 2) {
+        // Switch to Herelink HDMI2
+        _videoSettings->cameraId()->setRawValue(1);
+        // Trigger camera switch through VideoStreamControl
+        // The videoNeedsReset signal from VideoStreamControl will restart the video
+    }
+    _restartVideo(0);
+}
+
+//-----------------------------------------------------------------------------
+void
 VideoManager::_tcpUrlChanged()
 {
     _restartVideo(0);
@@ -739,8 +765,17 @@ VideoManager::_updateSettings(unsigned id)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("udp265://0.0.0.0:%1").arg(_videoSettings->udpPort()->rawValue().toInt()));
     else if (source == VideoSettings::videoSourceMPEGTS)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("mpegts://0.0.0.0:%1").arg(_videoSettings->udpPort()->rawValue().toInt()));
-    else if (source == VideoSettings::videoSourceRTSP)
-        settingsChanged |= _updateVideoUri(0, _videoSettings->rtspUrl()->rawValue().toString());
+    else if (source == VideoSettings::videoSourceRTSP) {
+        // Check currentStream setting to determine which RTSP URL to use
+        unsigned int currentStream = _videoSettings->currentStream()->rawValue().toUInt();
+        if (currentStream == 1) {
+            // Use RTSP URL 2
+            settingsChanged |= _updateVideoUri(0, _videoSettings->rtspUrl2()->rawValue().toString());
+        } else {
+            // Default to RTSP URL 1 (currentStream == 0 or any other value)
+            settingsChanged |= _updateVideoUri(0, _videoSettings->rtspUrl()->rawValue().toString());
+        }
+    }
     else if (source == VideoSettings::videoSourceTCP)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("tcp://%1").arg(_videoSettings->tcpUrl()->rawValue().toString()));
     else if (source == VideoSettings::videoSource3DRSolo)
