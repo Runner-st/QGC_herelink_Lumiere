@@ -65,7 +65,7 @@ Item {
         anchors.right:  parent.right          // Changed to right side
         anchors.top:    parent.top            // Changed to top
         anchors.rightMargin:    ScreenTools.defaultFontPixelWidth
-        anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 8  // Leave space for instruments
+        anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 6  // Leave space for instruments
         
         width:          mainLayout.width + (ScreenTools.defaultFontPixelWidth * 2)
         height:         mainLayout.height + (ScreenTools.defaultFontPixelHeight * 1.5)
