@@ -165,8 +165,8 @@ Item {
     QGCPipOverlay {
         id:                     _pipOverlay
         anchors.left:           parent.left
-        anchors.bottom:         parent.bottom
-        anchors.margins:        _toolsMargin + widgetLayer.servoBottomInset
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin:     _toolsMargin
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
         item1:                  mapControl
         item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
