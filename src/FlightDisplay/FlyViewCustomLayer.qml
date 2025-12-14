@@ -59,6 +59,17 @@ Item {
 
         _isSwitchingStream = true  // Prevent feedback loop
 
+        console.log("[C12] Switching to RTSP video source")
+
+        // First, ensure we're in RTSP video source mode
+        var currentSource = _videoSettings.videoSource.rawValue
+        var rtspSource = _videoSettings.rtspVideoSource  // "RTSP Video Stream"
+
+        if (currentSource !== rtspSource) {
+            console.log("[C12] Changing video source from", currentSource, "to", rtspSource)
+            _videoSettings.videoSource.rawValue = rtspSource
+        }
+
         // Get current URLs
         var url1 = _videoSettings.rtspUrl.rawValue
         var url2 = _videoSettings.rtspUrl2.rawValue
@@ -73,7 +84,7 @@ Item {
             console.log("[C12] Switched to Stream 2:", url2)
         } else {
             _streamButtonLabel = "Stream1"
-            console.log("[C12] Switched to Stream 1:", url1)
+            console.log("[C12] Switched to Stream 1:", url2)
         }
 
         _isSwitchingStream = false
@@ -83,6 +94,29 @@ Item {
     function switchToHdmi2() {
         if (QGroundControl.corePlugin.isHerelink && _videoSettings) {
             console.log("[C12] Switching to HDMI2 (camera ID 1)")
+            console.log("[C12] Current video source:", _videoSettings.videoSource.rawValue)
+            console.log("[C12] Current camera ID:", _videoSettings.cameraId.rawValue)
+
+            // Determine the correct Herelink video source
+            // Try Herelink Hotspot first (most common), fallback to Air Unit
+            var herelinkSource = "Herelink Hotspot"
+            var currentSource = _videoSettings.videoSource.rawValue
+
+            // Check if current source is already a Herelink source
+            if (currentSource.indexOf("Herelink") === -1) {
+                // Not currently on Herelink source, switch to it
+                console.log("[C12] Changing video source from", currentSource, "to", herelinkSource)
+                _videoSettings.videoSource.rawValue = herelinkSource
+            } else {
+                console.log("[C12] Already on Herelink video source:", currentSource)
+            }
+
+            // Force a camera ID change by setting to a different value first if already at target
+            if (_videoSettings.cameraId.rawValue === 1) {
+                console.log("[C12] Camera ID already 1, forcing change by toggling to 0 first")
+                _videoSettings.cameraId.rawValue = 0
+            }
+
             _videoSettings.cameraId.rawValue = 1  // HDMI2 is camera ID 1
             console.log("[C12] Camera ID set to:", _videoSettings.cameraId.rawValue)
         } else {

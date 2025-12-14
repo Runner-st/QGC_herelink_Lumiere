@@ -117,6 +117,9 @@ void QGCLoggingCategoryRegister::setFilterRulesFromSettings(const QString& comma
     // Logging from GStreamer library itself controlled by gstreamer debug levels is always turned on
     filterRules += filterRuleFormat.arg("GStreamerAPILog");
 
+    // Enable VideoStreamControl logging for debugging HDMI switching
+    filterRules += filterRuleFormat.arg("VideoStreamControlLog");
+
     filterRules += "qt.qml.connections=false";
 
     qDebug() << "Filter rules" << filterRules;
