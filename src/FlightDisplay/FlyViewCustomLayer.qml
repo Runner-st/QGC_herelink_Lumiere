@@ -98,8 +98,8 @@ Item {
             console.log("[C12] Current camera ID:", _videoSettings.cameraId.rawValue)
 
             // Determine the correct Herelink video source
-            // Try Herelink Hotspot first (most common), fallback to Air Unit
-            var herelinkSource = "Herelink Hotspot"
+            // Use Herelink AirUnit for HDMI passthrough
+            var herelinkSource = "Herelink AirUnit"
             var currentSource = _videoSettings.videoSource.rawValue
 
             // Check if current source is already a Herelink source
