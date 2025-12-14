@@ -82,7 +82,11 @@ Item {
     // Function to switch to HDMI2
     function switchToHdmi2() {
         if (QGroundControl.corePlugin.isHerelink && _videoSettings) {
+            console.log("[C12] Switching to HDMI2 (camera ID 1)")
             _videoSettings.cameraId.rawValue = 1  // HDMI2 is camera ID 1
+            console.log("[C12] Camera ID set to:", _videoSettings.cameraId.rawValue)
+        } else {
+            console.log("[C12] Cannot switch to HDMI2 - isHerelink:", QGroundControl.corePlugin.isHerelink, "videoSettings:", _videoSettings)
         }
     }
 

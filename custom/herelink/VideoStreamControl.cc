@@ -44,6 +44,7 @@ void VideoStreamControl::_settingInProgressTimeout()
 
 void VideoStreamControl::_cameraIdChanged()
 {
+    qCDebug(VideoStreamControlLog) << "Camera ID changed to:" << _videoSettings->cameraId()->rawValue();
     _setCameraIdLockUi(true);
 }
 
@@ -78,10 +79,12 @@ void VideoStreamControl::_handleHeartbeatInfo(LinkInterface* link, mavlink_messa
 
 void VideoStreamControl::_setCameraId()
 {
-    if(_cameraCount > 1) {
-        _cameraIdSetting = _videoSettings->cameraId()->rawValue().toUInt();
-        _startVideoStreaming();
-    }
+    _cameraIdSetting = _videoSettings->cameraId()->rawValue().toUInt();
+    qCDebug(VideoStreamControlLog) << "Setting camera ID to:" << _cameraIdSetting << "Camera count:" << _cameraCount;
+
+    // Always attempt to switch cameras when explicitly requested
+    // The _startVideoStreaming() function will check if link is available
+    _startVideoStreaming();
 }
 
 void VideoStreamControl::_setCameraIdLockUi(bool lockUi)
@@ -100,9 +103,10 @@ void VideoStreamControl::_setCameraIdLockUi(bool lockUi)
 
 void VideoStreamControl::_startVideoStreaming() {
     if (_linkInterface == NULL) {
+        qCDebug(VideoStreamControlLog) << "Cannot start video stream - no link interface available";
         return;
     }
-    qCDebug(VideoStreamControlLog) << "Start Video Stream" << _systemId;
+    qCDebug(VideoStreamControlLog) << "Starting video stream - System ID:" << _systemId << "Camera ID:" << _cameraIdSetting;
     mavlink_message_t msg;
     mavlink_msg_command_long_pack(_mavlinkProtocol->getSystemId(), _mavlinkProtocol->getComponentId(), &msg,
                                       _systemId, MAV_COMP_ID_CAMERA,
@@ -112,6 +116,7 @@ void VideoStreamControl::_startVideoStreaming() {
 
     _linkInterface->writeBytesThreadSafe((const char*)buffer, len);
 
+    qCDebug(VideoStreamControlLog) << "MAVLink command sent, emitting videoNeedsReset signal";
     emit videoNeedsReset();
 }
 
