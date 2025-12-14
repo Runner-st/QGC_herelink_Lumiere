@@ -37,42 +37,46 @@ Item {
 
     property var _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
     property var _videoSettings:    QGroundControl.settingsManager.videoSettings
-    property int _currentStreamIndex: 0  // 0: Stream1, 1: Stream2
-
-    // Store the original RTSP URLs to preserve them during switching
-    property string _storedRtspUrl1: ""
-    property string _storedRtspUrl2: ""
     property bool _urlsInitialized: false
+    property bool _isSwitchingStream: false  // Flag to prevent feedback loops
 
-    // Stream button labels
-    property string _streamButtonLabel: _currentStreamIndex === 0 ? qsTr("Stream1") : qsTr("Stream2")
+    // Stream button label - shows which stream is CURRENTLY ACTIVE
+    property string _streamButtonLabel: "Stream1"
 
-    // Initialize stored URLs on component completion
+    // Initialize on component completion
     Component.onCompleted: {
         if (_videoSettings) {
-            _storedRtspUrl1 = _videoSettings.rtspUrl.rawValue
-            _storedRtspUrl2 = _videoSettings.rtspUrl2.rawValue
             _urlsInitialized = true
+            console.log("[C12] Stream switcher initialized")
+            console.log("[C12] URL1:", _videoSettings.rtspUrl.rawValue)
+            console.log("[C12] URL2:", _videoSettings.rtspUrl2.rawValue)
         }
     }
 
-    // Function to toggle between RTSP streams
+    // Function to toggle between RTSP streams by SWAPPING the URL values
     function toggleRtspStream() {
         if (!_videoSettings || !_urlsInitialized) return
 
-        if (_currentStreamIndex === 0) {
-            // Switch to Stream2
-            if (_storedRtspUrl2 !== "") {
-                _videoSettings.rtspUrl.rawValue = _storedRtspUrl2
-                _currentStreamIndex = 1
-            }
+        _isSwitchingStream = true  // Prevent feedback loop
+
+        // Get current URLs
+        var url1 = _videoSettings.rtspUrl.rawValue
+        var url2 = _videoSettings.rtspUrl2.rawValue
+
+        // Swap them
+        _videoSettings.rtspUrl.rawValue = url2
+        _videoSettings.rtspUrl2.rawValue = url1
+
+        // Update button label
+        if (_streamButtonLabel === "Stream1") {
+            _streamButtonLabel = "Stream2"
+            console.log("[C12] Switched to Stream 2:", url2)
         } else {
-            // Switch back to Stream1
-            if (_storedRtspUrl1 !== "") {
-                _videoSettings.rtspUrl.rawValue = _storedRtspUrl1
-                _currentStreamIndex = 0
-            }
+            _streamButtonLabel = "Stream1"
+            console.log("[C12] Switched to Stream 1:", url1)
         }
+
+        _isSwitchingStream = false
     }
 
     // Function to switch to HDMI2
@@ -140,7 +144,8 @@ Item {
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
                     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
                     onClicked:              toggleRtspStream()
-                    enabled:                _urlsInitialized && (_storedRtspUrl1 !== "" || _storedRtspUrl2 !== "")
+                    enabled:                _urlsInitialized && _videoSettings &&
+                                          (_videoSettings.rtspUrl.rawValue !== "" || _videoSettings.rtspUrl2.rawValue !== "")
                 }
 
                 QGCButton {
