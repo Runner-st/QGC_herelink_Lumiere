@@ -342,6 +342,17 @@ Rectangle {
                                 }
 
                                 QGCLabel {
+                                    id:         rtspUrl2Label
+                                    text:       qsTr("RTSP URL 2")
+                                    visible:    !_videoAutoStreamConfig && _isRTSP && _videoSettings.rtspUrl2.visible
+                                }
+                                FactTextField {
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    fact:                   _videoSettings.rtspUrl2
+                                    visible:                rtspUrl2Label.visible
+                                }
+
+                                QGCLabel {
                                     id:         tcpUrlLabel
                                     text:       qsTr("TCP URL")
                                     visible:    !_videoAutoStreamConfig && _isTCP && _videoSettings.tcpUrl.visible

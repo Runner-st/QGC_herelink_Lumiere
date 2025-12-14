@@ -36,6 +36,51 @@ Item {
     property var mapControl
 
     property var _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+    property var _videoSettings:    QGroundControl.settingsManager.videoSettings
+    property int _currentStreamIndex: 0  // 0: Stream1, 1: Stream2
+
+    // Store the original RTSP URLs to preserve them during switching
+    property string _storedRtspUrl1: ""
+    property string _storedRtspUrl2: ""
+    property bool _urlsInitialized: false
+
+    // Stream button labels
+    property string _streamButtonLabel: _currentStreamIndex === 0 ? qsTr("Stream1") : qsTr("Stream2")
+
+    // Initialize stored URLs on component completion
+    Component.onCompleted: {
+        if (_videoSettings) {
+            _storedRtspUrl1 = _videoSettings.rtspUrl.rawValue
+            _storedRtspUrl2 = _videoSettings.rtspUrl2.rawValue
+            _urlsInitialized = true
+        }
+    }
+
+    // Function to toggle between RTSP streams
+    function toggleRtspStream() {
+        if (!_videoSettings || !_urlsInitialized) return
+
+        if (_currentStreamIndex === 0) {
+            // Switch to Stream2
+            if (_storedRtspUrl2 !== "") {
+                _videoSettings.rtspUrl.rawValue = _storedRtspUrl2
+                _currentStreamIndex = 1
+            }
+        } else {
+            // Switch back to Stream1
+            if (_storedRtspUrl1 !== "") {
+                _videoSettings.rtspUrl.rawValue = _storedRtspUrl1
+                _currentStreamIndex = 0
+            }
+        }
+    }
+
+    // Function to switch to HDMI2
+    function switchToHdmi2() {
+        if (QGroundControl.corePlugin.isHerelink && _videoSettings) {
+            _videoSettings.cameraId.rawValue = 1  // HDMI2 is camera ID 1
+        }
+    }
 
 // Tool insets - inform the system about space used by our custom controls
     QGCToolInsets {
@@ -83,6 +128,30 @@ Item {
             id:                 mainLayout
             anchors.centerIn:   parent
             spacing:            ScreenTools.defaultFontPixelHeight * 0.3  // Tighter spacing
+
+            // Stream Switching Controls Row
+            RowLayout {
+                spacing:            ScreenTools.defaultFontPixelWidth * 0.5
+                Layout.alignment:   Qt.AlignHCenter
+
+                QGCButton {
+                    id:                     rtspStreamButton
+                    text:                   _streamButtonLabel
+                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
+                    Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
+                    onClicked:              toggleRtspStream()
+                    enabled:                _urlsInitialized && (_storedRtspUrl1 !== "" || _storedRtspUrl2 !== "")
+                }
+
+                QGCButton {
+                    id:                     hdmi2Button
+                    text:                   qsTr("HDMI2")
+                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
+                    Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
+                    onClicked:              switchToHdmi2()
+                    enabled:                QGroundControl.corePlugin.isHerelink
+                }
+            }
 
             // Center Controls Row
             RowLayout {
