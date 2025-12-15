@@ -39,9 +39,46 @@ Item {
     property var _videoSettings:    QGroundControl.settingsManager.videoSettings
     property bool _urlsInitialized: false
     property bool _isSwitchingStream: false  // Flag to prevent feedback loops
+    property bool _pendingCameraIdChange: false  // Flag for delayed camera ID change
 
     // Stream button label - shows which stream is CURRENTLY ACTIVE
     property string _streamButtonLabel: "Stream1"
+
+    // Timer to delay camera ID changes when video source is also changing
+    Timer {
+        id: cameraIdChangeTimer
+        interval: 500  // 500ms delay to allow video source change to complete
+        repeat: false
+        onTriggered: {
+            if (_pendingCameraIdChange && _videoSettings) {
+                console.log("[C12] Timer: Now changing camera ID after video source change")
+                // Force a camera ID change by setting to a different value first if already at target
+                if (_videoSettings.cameraId.rawValue === 1) {
+                    console.log("[C12] Timer: Camera ID already 1, forcing change by toggling to 0 first")
+                    _videoSettings.cameraId.rawValue = 0
+                    // Use another short timer to set it back to 1
+                    cameraIdFinalizeTimer.start()
+                } else {
+                    _videoSettings.cameraId.rawValue = 1  // HDMI2 is camera ID 1
+                    console.log("[C12] Timer: Camera ID set to:", _videoSettings.cameraId.rawValue)
+                }
+                _pendingCameraIdChange = false
+            }
+        }
+    }
+
+    // Timer to finalize camera ID change (set to 1 after setting to 0)
+    Timer {
+        id: cameraIdFinalizeTimer
+        interval: 100  // Short delay between toggle
+        repeat: false
+        onTriggered: {
+            if (_videoSettings) {
+                _videoSettings.cameraId.rawValue = 1
+                console.log("[C12] Timer: Camera ID finalized to:", _videoSettings.cameraId.rawValue)
+            }
+        }
+    }
 
     // Initialize on component completion
     Component.onCompleted: {
@@ -97,23 +134,39 @@ Item {
             console.log("[C12] Current video source:", _videoSettings.videoSource.rawValue)
             console.log("[C12] Current camera ID:", _videoSettings.cameraId.rawValue)
 
+            // Stop any pending camera ID change
+            cameraIdChangeTimer.stop()
+            cameraIdFinalizeTimer.stop()
+            _pendingCameraIdChange = false
+
             // Determine the correct Herelink video source
             // Use Herelink AirUnit for HDMI passthrough
             var herelinkSource = "Herelink AirUnit"
             var currentSource = _videoSettings.videoSource.rawValue
 
-            // Always set the video source to force a refresh
-            console.log("[C12] Setting video source from", currentSource, "to", herelinkSource)
-            _videoSettings.videoSource.rawValue = herelinkSource
+            // Check if video source needs to change
+            var sourceNeedsChange = (currentSource !== herelinkSource)
 
-            // Force a camera ID change by setting to a different value first if already at target
-            if (_videoSettings.cameraId.rawValue === 1) {
-                console.log("[C12] Camera ID already 1, forcing change by toggling to 0 first")
-                _videoSettings.cameraId.rawValue = 0
+            if (sourceNeedsChange) {
+                // Video source is changing - delay camera ID change to avoid race condition
+                console.log("[C12] Video source changing from", currentSource, "to", herelinkSource)
+                console.log("[C12] Delaying camera ID change by 500ms to allow video source change to complete")
+                _videoSettings.videoSource.rawValue = herelinkSource
+                _pendingCameraIdChange = true
+                cameraIdChangeTimer.start()
+            } else {
+                // Video source is already correct - change camera ID immediately
+                console.log("[C12] Video source already", herelinkSource, "- changing camera ID immediately")
+
+                // Force a camera ID change by setting to a different value first if already at target
+                if (_videoSettings.cameraId.rawValue === 1) {
+                    console.log("[C12] Camera ID already 1, forcing change by toggling to 0 first")
+                    _videoSettings.cameraId.rawValue = 0
+                }
+
+                _videoSettings.cameraId.rawValue = 1  // HDMI2 is camera ID 1
+                console.log("[C12] Camera ID set to:", _videoSettings.cameraId.rawValue)
             }
-
-            _videoSettings.cameraId.rawValue = 1  // HDMI2 is camera ID 1
-            console.log("[C12] Camera ID set to:", _videoSettings.cameraId.rawValue)
         } else {
             console.log("[C12] Cannot switch to HDMI2 - isHerelink:", QGroundControl.corePlugin.isHerelink, "videoSettings:", _videoSettings)
         }
