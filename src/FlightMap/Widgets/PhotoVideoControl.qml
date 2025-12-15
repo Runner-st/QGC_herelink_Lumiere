@@ -24,8 +24,7 @@ import QGroundControl.FactSystem        1.0
 import QGroundControl.FactControls      1.0
 
 Rectangle {
-    // height:     settingsButton.height + hdmiToggleButton.height + mainLayout.height + (_margins * 5)
-    height:     hdmiToggleButton.height + mainLayout.height + (_margins * 5)
+    height:     mainLayout.height + (_margins * 2)
     color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
     radius:     _margins
     visible:    (_mavlinkCamera || _videoStreamAvailable || _simpleCameraAvailable) && multiVehiclePanelSelector.showSingleVehiclePanel
@@ -181,23 +180,10 @@ Rectangle {
         }
     }
 
-    QGCButton {
-        id:                     hdmiToggleButton
-        anchors.margins:        _margins
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top:            parent.top
-        anchors.topMargin:      _margins
-        visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
-        text:                   _currentHdmiLabel
-        enabled:                !QGroundControl.videoManager.videoStreamControl.settingInProgress
-        onClicked:              toggleHerelinkHdmiSource()
-    }
-
     ColumnLayout {
         id:                         mainLayout
         anchors.margins:            _margins
-        anchors.top:                hdmiToggleButton.bottom
-        anchors.topMargin:          _margins + 30
+        anchors.top:                parent.top
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
 
@@ -470,6 +456,12 @@ Rectangle {
                     }
 
                     QGCLabel {
+                        text:               qsTr("HDMI Source")
+                        visible:            QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
+                        onVisibleChanged:   gridLayout.dynamicRows += visible ? 1 : -1
+                    }
+
+                    QGCLabel {
                         text:               qsTr("Video Grid Lines")
                         visible:            _anyVideoStreamAvailable
                         onVisibleChanged:   gridLayout.dynamicRows += visible ? 1 : -1
@@ -609,6 +601,14 @@ Rectangle {
                                 _mavlinkCamera.photoLapse = value
                             }
                         }
+                    }
+
+                    QGCButton {
+                        Layout.fillWidth:   true
+                        text:               _currentHdmiLabel
+                        visible:            QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
+                        enabled:            !QGroundControl.videoManager.videoStreamControl.settingInProgress
+                        onClicked:          toggleHerelinkHdmiSource()
                     }
 
                     QGCSwitch {
