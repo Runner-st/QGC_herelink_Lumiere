@@ -672,8 +672,13 @@ VideoManager::_updateSettings(unsigned id)
     _lowLatencyStreaming[id] = lowLatencyStreaming;
 
     //-- Auto discovery
+    // Skip auto-discovery when using Herelink-specific video sources to prevent
+    // camera manager from overriding manual video source settings
+    QString source = _videoSettings->videoSource()->rawValue().toString();
+    bool isHerelinkManualMode = (source == VideoSettings::videoSourceHerelinkAirUnit ||
+                                  source == VideoSettings::videoSourceHerelinkHotspot);
 
-    if(_activeVehicle && _activeVehicle->cameraManager()) {
+    if(_activeVehicle && _activeVehicle->cameraManager() && !isHerelinkManualMode) {
         QGCVideoStreamInfo* pInfo = _activeVehicle->cameraManager()->currentStreamInstance();
         if(pInfo) {
             if (id == 0) {
@@ -732,7 +737,7 @@ VideoManager::_updateSettings(unsigned id)
             return settingsChanged;
         }
     }
-    QString source = _videoSettings->videoSource()->rawValue().toString();
+    // source is already declared above
     if (source == VideoSettings::videoSourceUDPH264)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("udp://0.0.0.0:%1").arg(_videoSettings->udpPort()->rawValue().toInt()));
     else if (source == VideoSettings::videoSourceUDPH265)
