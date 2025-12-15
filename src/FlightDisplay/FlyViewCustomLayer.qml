@@ -102,14 +102,9 @@ Item {
             var herelinkSource = "Herelink AirUnit"
             var currentSource = _videoSettings.videoSource.rawValue
 
-            // Check if current source is already a Herelink source
-            if (currentSource.indexOf("Herelink") === -1) {
-                // Not currently on Herelink source, switch to it
-                console.log("[C12] Changing video source from", currentSource, "to", herelinkSource)
-                _videoSettings.videoSource.rawValue = herelinkSource
-            } else {
-                console.log("[C12] Already on Herelink video source:", currentSource)
-            }
+            // Always set the video source to force a refresh
+            console.log("[C12] Setting video source from", currentSource, "to", herelinkSource)
+            _videoSettings.videoSource.rawValue = herelinkSource
 
             // Force a camera ID change by setting to a different value first if already at target
             if (_videoSettings.cameraId.rawValue === 1) {
