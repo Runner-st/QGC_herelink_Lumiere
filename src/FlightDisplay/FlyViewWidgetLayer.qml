@@ -17,16 +17,15 @@ import QtPositioning            5.3
 import QtQuick.Window           2.2
 import QtQml.Models             2.1
 
-import QGroundControl               1.0
-import QGroundControl.Controls      1.0
-import QGroundControl.Controllers   1.0
-import QGroundControl.Controls      1.0
-import QGroundControl.FactSystem    1.0
-import QGroundControl.FlightDisplay 1.0
-import QGroundControl.FlightMap     1.0
-import QGroundControl.Palette       1.0
-import QGroundControl.ScreenTools   1.0
-import QGroundControl.Vehicle       1.0
+import QGroundControl                   1.0
+import QGroundControl.Controls          1.0
+import QGroundControl.Controllers       1.0
+import QGroundControl.FactSystem        1.0
+import QGroundControl.FlightDisplay     1.0
+import QGroundControl.FlightMap         1.0
+import QGroundControl.Palette           1.0
+import QGroundControl.ScreenTools       1.0
+import QGroundControl.Vehicle           1.0
 
 // This is the ui overlay layer for the widgets/tools for Fly View
 Item {
@@ -300,15 +299,21 @@ Item {
     // C12 Camera Movement Widget
     Rectangle {
         id:                     c12MovementWidget
-        anchors.margins:        _toolsMargin
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top:            parent.top
-        width:                  ScreenTools.defaultFontPixelWidth * 5
+        anchors.centerIn:       parent
+        width:                  ScreenTools.defaultFontPixelHeight * 3
         height:                 ScreenTools.defaultFontPixelHeight * 10
         color:                  Qt.rgba(0, 0, 0, 0.75)
         radius:                 ScreenTools.defaultFontPixelWidth * 0.5
-        visible:                !QGroundControl.videoManager.fullScreen
+        visible:                _activeVehicle && !QGroundControl.videoManager.fullScreen
         z:                      QGroundControl.zOrderWidgets
+
+        Component.onCompleted: console.log("[C12 Widget] Loaded")
+
+        onVisibleChanged: {
+            console.log("[C12 Widget] Visibility changed:", visible,
+                       "| activeVehicle:", _activeVehicle ? "YES" : "NO",
+                       "| fullScreen:", QGroundControl.videoManager.fullScreen)
+        }
 
         Column {
             anchors.centerIn:   parent
@@ -316,28 +321,28 @@ Item {
 
             QGCButton {
                 text:                   "→"
-                width:                  ScreenTools.defaultFontPixelWidth * 4
+                width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveRight()
             }
 
             QGCButton {
                 text:                   "←"
-                width:                  ScreenTools.defaultFontPixelWidth * 4
+                width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveLeft()
             }
 
             QGCButton {
                 text:                   "↑"
-                width:                  ScreenTools.defaultFontPixelWidth * 4
+                width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveUp()
             }
 
             QGCButton {
                 text:                   "↓"
-                width:                  ScreenTools.defaultFontPixelWidth * 4
+                width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveDown()
             }
