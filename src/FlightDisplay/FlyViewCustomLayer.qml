@@ -372,11 +372,115 @@ Item {
             anchors.fill:           parent
             hoverEnabled:           true
             propagateComposedEvents: true
-            
+
             onEntered: parent.opacity = 0.85
             onExited:  parent.opacity = 0.75
-            
+
             onPressed: mouse.accepted = false
+        }
+    }
+
+    // C12 Camera Movement Widget
+    Rectangle {
+        id:                     c12MovementWidget
+        anchors.left:           parent.left
+        anchors.top:            parent.top
+        anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.75 + parentToolInsets.leftEdgeCenterInset + ScreenTools.defaultFontPixelWidth * 4
+        anchors.topMargin:      ScreenTools.defaultFontPixelWidth * 0.75 + parentToolInsets.topEdgeLeftInset
+        width:                  ScreenTools.defaultFontPixelHeight * 3
+        height:                 ScreenTools.defaultFontPixelHeight * 10
+        color:                  Qt.rgba(0, 0, 0, 0.75)
+        radius:                 ScreenTools.defaultFontPixelWidth * 0.5
+        visible:                _activeVehicle && !QGroundControl.videoManager.fullScreen
+        z:                      QGroundControl.zOrderWidgets
+
+        Component.onCompleted: console.log("[C12 Widget] Loaded")
+
+        onVisibleChanged: {
+            console.log("[C12 Widget] Visibility changed:", visible,
+                       "| activeVehicle:", _activeVehicle ? "YES" : "NO",
+                       "| fullScreen:", QGroundControl.videoManager.fullScreen)
+        }
+
+        Column {
+            anchors.centerIn:   parent
+            spacing:            ScreenTools.defaultFontPixelHeight * 0.25
+
+            QGCButton {
+                text:                   "→"
+                width:                  ScreenTools.defaultFontPixelHeight * 2
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12Controller.moveRight()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveRightTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12Controller.moveRight()
+                }
+
+                onPressedChanged: isHeld = pressed
+            }
+
+            QGCButton {
+                text:                   "←"
+                width:                  ScreenTools.defaultFontPixelHeight * 2
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12Controller.moveLeft()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveLeftTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12Controller.moveLeft()
+                }
+
+                onPressedChanged: isHeld = pressed
+            }
+
+            QGCButton {
+                text:                   "↑"
+                width:                  ScreenTools.defaultFontPixelHeight * 2
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12Controller.moveUp()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveUpTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12Controller.moveUp()
+                }
+
+                onPressedChanged: isHeld = pressed
+            }
+
+            QGCButton {
+                text:                   "↓"
+                width:                  ScreenTools.defaultFontPixelHeight * 2
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12Controller.moveDown()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveDownTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12Controller.moveDown()
+                }
+
+                onPressedChanged: isHeld = pressed
+            }
         }
     }
 }

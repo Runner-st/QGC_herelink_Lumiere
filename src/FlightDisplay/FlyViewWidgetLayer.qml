@@ -299,7 +299,10 @@ Item {
     // C12 Camera Movement Widget
     Rectangle {
         id:                     c12MovementWidget
-        anchors.centerIn:       parent
+        anchors.left:           toolStrip.right
+        anchors.top:            parent.top
+        anchors.leftMargin:     _toolsMargin
+        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
         width:                  ScreenTools.defaultFontPixelHeight * 3
         height:                 ScreenTools.defaultFontPixelHeight * 10
         color:                  Qt.rgba(0, 0, 0, 0.75)
@@ -324,6 +327,18 @@ Item {
                 width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveRight()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveRightTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12CameraController.moveRight()
+                }
+
+                onPressedChanged: isHeld = pressed
             }
 
             QGCButton {
@@ -331,6 +346,18 @@ Item {
                 width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveLeft()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveLeftTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12CameraController.moveLeft()
+                }
+
+                onPressedChanged: isHeld = pressed
             }
 
             QGCButton {
@@ -338,6 +365,18 @@ Item {
                 width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveUp()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveUpTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12CameraController.moveUp()
+                }
+
+                onPressedChanged: isHeld = pressed
             }
 
             QGCButton {
@@ -345,6 +384,18 @@ Item {
                 width:                  ScreenTools.defaultFontPixelHeight * 2
                 height:                 ScreenTools.defaultFontPixelHeight * 2
                 onClicked:              c12CameraController.moveDown()
+
+                property bool isHeld: false
+
+                Timer {
+                    id:         moveDownTimer
+                    interval:   200
+                    repeat:     true
+                    running:    parent.isHeld
+                    onTriggered: c12CameraController.moveDown()
+                }
+
+                onPressedChanged: isHeld = pressed
             }
         }
 
