@@ -28,6 +28,12 @@ public:
     Q_INVOKABLE void sendVertCommand();
     Q_INVOKABLE void sendCustomCommand(const QString& command);
 
+    // Camera directional movement
+    Q_INVOKABLE void moveRight();
+    Q_INVOKABLE void moveLeft();
+    Q_INVOKABLE void moveUp();
+    Q_INVOKABLE void moveDown();
+
 private:
     void sendCommand(const QString& command);
 

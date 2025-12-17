@@ -12,7 +12,7 @@ CustomC12Controller::CustomC12Controller(QObject *parent)
     , _udpSocket(new QUdpSocket(this))
     , _cameraAddress("192.168.144.108")
     , _cameraPort(5000)
-    , _currentPaletteIndex(0)
+    , _currentPaletteIndex(9)
 {
     qDebug() << "=== C12 Camera Controller Initialized ===";
     qDebug() << "Target Address:" << _cameraAddress.toString();
@@ -112,4 +112,28 @@ void CustomC12Controller::sendCustomCommand(const QString& command)
 {
     qDebug() << "[C12] Custom Command:" << command;
     sendCommand(command);
+}
+
+void CustomC12Controller::moveRight()
+{
+    qDebug() << "[C12] Move Right";
+    sendCommand("#TPUG2wGSY1262");
+}
+
+void CustomC12Controller::moveLeft()
+{
+    qDebug() << "[C12] Move Left";
+    sendCommand("#TPUG2wGSYED88");
+}
+
+void CustomC12Controller::moveUp()
+{
+    qDebug() << "[C12] Move Up";
+    sendCommand("#TPUG2wGSP145B");
+}
+
+void CustomC12Controller::moveDown()
+{
+    qDebug() << "[C12] Move Down";
+    sendCommand("#TPUG2wGSPEC7E");
 }

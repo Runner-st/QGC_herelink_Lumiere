@@ -292,6 +292,60 @@ Item {
         property real topEdgeCenterInset: visible ? y + height : 0
     }
 
+    // C12 Camera Controller Instance
+    CustomC12Controller {
+        id: c12CameraController
+    }
+
+    // C12 Camera Movement Widget
+    Rectangle {
+        id:                     c12MovementWidget
+        anchors.margins:        _toolsMargin
+        anchors.left:           toolStrip.right
+        anchors.top:            parent.top
+        width:                  ScreenTools.defaultFontPixelWidth * 5
+        height:                 ScreenTools.defaultFontPixelHeight * 10
+        color:                  Qt.rgba(0, 0, 0, 0.75)
+        radius:                 ScreenTools.defaultFontPixelWidth * 0.5
+        visible:                !QGroundControl.videoManager.fullScreen
+
+        Column {
+            anchors.centerIn:   parent
+            spacing:            ScreenTools.defaultFontPixelHeight * 0.25
+
+            QGCButton {
+                text:                   "→"
+                width:                  ScreenTools.defaultFontPixelWidth * 4
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12CameraController.moveRight()
+            }
+
+            QGCButton {
+                text:                   "←"
+                width:                  ScreenTools.defaultFontPixelWidth * 4
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12CameraController.moveLeft()
+            }
+
+            QGCButton {
+                text:                   "↑"
+                width:                  ScreenTools.defaultFontPixelWidth * 4
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12CameraController.moveUp()
+            }
+
+            QGCButton {
+                text:                   "↓"
+                width:                  ScreenTools.defaultFontPixelWidth * 4
+                height:                 ScreenTools.defaultFontPixelHeight * 2
+                onClicked:              c12CameraController.moveDown()
+            }
+        }
+
+        property real leftEdgeTopInset: visible ? x + width : 0
+        property real topEdgeLeftInset: visible ? y + height : 0
+    }
+
     Component {
         id: preFlightChecklistPopup
         FlyViewPreFlightChecklistPopup {
