@@ -51,13 +51,13 @@ Item {
 
     QGCToolInsets {
         id:                     _totalToolInsets
-        leftEdgeTopInset:       toolStrip.leftEdgeTopInset
+        leftEdgeTopInset:       leftControlsContainer.leftEdgeTopInset
         leftEdgeCenterInset:    parentToolInsets.leftEdgeCenterInset
         leftEdgeBottomInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.leftEdgeBottomInset : parentToolInsets.leftEdgeBottomInset
         rightEdgeTopInset:      instrumentPanel.rightEdgeTopInset
         rightEdgeCenterInset:   (telemetryPanel.rightEdgeCenterInset > photoVideoControl.rightEdgeCenterInset) ? telemetryPanel.rightEdgeCenterInset : photoVideoControl.rightEdgeCenterInset
         rightEdgeBottomInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.rightEdgeBottomInset : parentToolInsets.rightEdgeBottomInset
-        topEdgeLeftInset:       toolStrip.topEdgeLeftInset
+        topEdgeLeftInset:       leftControlsContainer.topEdgeLeftInset
         topEdgeCenterInset:     mapScale.topEdgeCenterInset
         topEdgeRightInset:      instrumentPanel.topEdgeRightInset
         bottomEdgeLeftInset: {
@@ -253,19 +253,140 @@ Item {
         property real rightEdgeBottomInset: visible ? bottomEdgeRightInset + width/18 - ScreenTools.defaultFontPixelHeight*2 : 0
     }
 
-    FlyViewToolStrip {
-        id:                     toolStrip
-        anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
-        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
+    // C12 Camera Controller Instance
+    CustomC12Controller {
+        id: c12CameraController
+    }
+
+    // Left Controls Container - combines Fly Tools and C12 Movement Widget
+    Rectangle {
+        id:                     leftControlsContainer
         anchors.left:           parent.left
         anchors.top:            parent.top
-        z:                      QGroundControl.zOrderWidgets
-        maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+        anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
+        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
+        color:                  Qt.rgba(0, 0, 0, 0.75)
+        radius:                 ScreenTools.defaultFontPixelWidth * 0.5
         visible:                !QGroundControl.videoManager.fullScreen
+        z:                      QGroundControl.zOrderWidgets
 
-        onDisplayPreFlightChecklist: preFlightChecklistPopup.createObject(mainWindow).open()
+        width:                  controlsRow.width + (ScreenTools.defaultFontPixelWidth * 1)
+        height:                 controlsRow.height + (ScreenTools.defaultFontPixelHeight * 0.5)
 
+        Row {
+            id:                 controlsRow
+            anchors.centerIn:   parent
+            spacing:            ScreenTools.defaultFontPixelWidth * 0.5
 
+            FlyViewToolStrip {
+                id:                     toolStrip
+                maxHeight:              _root.height - leftControlsContainer.y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+                visible:                true  // Always visible when container is visible
+
+                onDisplayPreFlightChecklist: preFlightChecklistPopup.createObject(mainWindow).open()
+            }
+
+            // C12 Camera Movement Widget - only visible when vehicle is connected
+            Rectangle {
+                id:                     c12MovementWidget
+                width:                  ScreenTools.defaultFontPixelHeight * 3
+                height:                 ScreenTools.defaultFontPixelHeight * 10
+                color:                  "transparent"
+                radius:                 ScreenTools.defaultFontPixelWidth * 0.5
+                visible:                _activeVehicle  // Only visible when vehicle connected
+
+                Component.onCompleted: console.log("[C12 Widget] Loaded")
+
+                onVisibleChanged: {
+                    console.log("[C12 Widget] Visibility changed:", visible,
+                               "| activeVehicle:", _activeVehicle ? "YES" : "NO",
+                               "| fullScreen:", QGroundControl.videoManager.fullScreen)
+                }
+
+                Column {
+                    anchors.centerIn:   parent
+                    spacing:            ScreenTools.defaultFontPixelHeight * 0.25
+
+                    QGCButton {
+                        text:                   "→"
+                        width:                  ScreenTools.defaultFontPixelHeight * 2
+                        height:                 ScreenTools.defaultFontPixelHeight * 2
+                        onClicked:              c12CameraController.moveRight()
+
+                        property bool isHeld: false
+
+                        Timer {
+                            id:         moveRightTimer
+                            interval:   200
+                            repeat:     true
+                            running:    parent.isHeld
+                            onTriggered: c12CameraController.moveRight()
+                        }
+
+                        onPressedChanged: isHeld = pressed
+                    }
+
+                    QGCButton {
+                        text:                   "←"
+                        width:                  ScreenTools.defaultFontPixelHeight * 2
+                        height:                 ScreenTools.defaultFontPixelHeight * 2
+                        onClicked:              c12CameraController.moveLeft()
+
+                        property bool isHeld: false
+
+                        Timer {
+                            id:         moveLeftTimer
+                            interval:   200
+                            repeat:     true
+                            running:    parent.isHeld
+                            onTriggered: c12CameraController.moveLeft()
+                        }
+
+                        onPressedChanged: isHeld = pressed
+                    }
+
+                    QGCButton {
+                        text:                   "↑"
+                        width:                  ScreenTools.defaultFontPixelHeight * 2
+                        height:                 ScreenTools.defaultFontPixelHeight * 2
+                        onClicked:              c12CameraController.moveUp()
+
+                        property bool isHeld: false
+
+                        Timer {
+                            id:         moveUpTimer
+                            interval:   200
+                            repeat:     true
+                            running:    parent.isHeld
+                            onTriggered: c12CameraController.moveUp()
+                        }
+
+                        onPressedChanged: isHeld = pressed
+                    }
+
+                    QGCButton {
+                        text:                   "↓"
+                        width:                  ScreenTools.defaultFontPixelHeight * 2
+                        height:                 ScreenTools.defaultFontPixelHeight * 2
+                        onClicked:              c12CameraController.moveDown()
+
+                        property bool isHeld: false
+
+                        Timer {
+                            id:         moveDownTimer
+                            interval:   200
+                            repeat:     true
+                            running:    parent.isHeld
+                            onTriggered: c12CameraController.moveDown()
+                        }
+
+                        onPressedChanged: isHeld = pressed
+                    }
+                }
+            }
+        }
+
+        // Inset properties for other widgets to reference
         property real topEdgeLeftInset: visible ? y + height : 0
         property real leftEdgeTopInset: visible ? x + width : 0
     }
@@ -282,125 +403,13 @@ Item {
     MapScale {
         id:                 mapScale
         anchors.margins:    _toolsMargin
-        anchors.left:       toolStrip.right
+        anchors.left:       leftControlsContainer.right
         anchors.top:        parent.top
         mapControl:         _mapControl
         buttonsOnLeft:      true
         visible:            !ScreenTools.isTinyScreen && QGroundControl.corePlugin.options.flyView.showMapScale && mapControl.pipState.state === mapControl.pipState.fullState
 
         property real topEdgeCenterInset: visible ? y + height : 0
-    }
-
-    // C12 Camera Controller Instance
-    CustomC12Controller {
-        id: c12CameraController
-    }
-
-    // C12 Camera Movement Widget
-    Rectangle {
-        id:                     c12MovementWidget
-        anchors.left:           toolStrip.right
-        anchors.top:            parent.top
-        anchors.leftMargin:     _toolsMargin
-        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
-        width:                  ScreenTools.defaultFontPixelHeight * 3
-        height:                 ScreenTools.defaultFontPixelHeight * 10
-        color:                  Qt.rgba(0, 0, 0, 0.75)
-        radius:                 ScreenTools.defaultFontPixelWidth * 0.5
-        visible:                _activeVehicle && !QGroundControl.videoManager.fullScreen
-        z:                      QGroundControl.zOrderWidgets
-
-        Component.onCompleted: console.log("[C12 Widget] Loaded")
-
-        onVisibleChanged: {
-            console.log("[C12 Widget] Visibility changed:", visible,
-                       "| activeVehicle:", _activeVehicle ? "YES" : "NO",
-                       "| fullScreen:", QGroundControl.videoManager.fullScreen)
-        }
-
-        Column {
-            anchors.centerIn:   parent
-            spacing:            ScreenTools.defaultFontPixelHeight * 0.25
-
-            QGCButton {
-                text:                   "→"
-                width:                  ScreenTools.defaultFontPixelHeight * 2
-                height:                 ScreenTools.defaultFontPixelHeight * 2
-                onClicked:              c12CameraController.moveRight()
-
-                property bool isHeld: false
-
-                Timer {
-                    id:         moveRightTimer
-                    interval:   200
-                    repeat:     true
-                    running:    parent.isHeld
-                    onTriggered: c12CameraController.moveRight()
-                }
-
-                onPressedChanged: isHeld = pressed
-            }
-
-            QGCButton {
-                text:                   "←"
-                width:                  ScreenTools.defaultFontPixelHeight * 2
-                height:                 ScreenTools.defaultFontPixelHeight * 2
-                onClicked:              c12CameraController.moveLeft()
-
-                property bool isHeld: false
-
-                Timer {
-                    id:         moveLeftTimer
-                    interval:   200
-                    repeat:     true
-                    running:    parent.isHeld
-                    onTriggered: c12CameraController.moveLeft()
-                }
-
-                onPressedChanged: isHeld = pressed
-            }
-
-            QGCButton {
-                text:                   "↑"
-                width:                  ScreenTools.defaultFontPixelHeight * 2
-                height:                 ScreenTools.defaultFontPixelHeight * 2
-                onClicked:              c12CameraController.moveUp()
-
-                property bool isHeld: false
-
-                Timer {
-                    id:         moveUpTimer
-                    interval:   200
-                    repeat:     true
-                    running:    parent.isHeld
-                    onTriggered: c12CameraController.moveUp()
-                }
-
-                onPressedChanged: isHeld = pressed
-            }
-
-            QGCButton {
-                text:                   "↓"
-                width:                  ScreenTools.defaultFontPixelHeight * 2
-                height:                 ScreenTools.defaultFontPixelHeight * 2
-                onClicked:              c12CameraController.moveDown()
-
-                property bool isHeld: false
-
-                Timer {
-                    id:         moveDownTimer
-                    interval:   200
-                    repeat:     true
-                    running:    parent.isHeld
-                    onTriggered: c12CameraController.moveDown()
-                }
-
-                onPressedChanged: isHeld = pressed
-            }
-        }
-
-        property real leftEdgeTopInset: visible ? x + width : 0
-        property real topEdgeLeftInset: visible ? y + height : 0
     }
 
     Component {
