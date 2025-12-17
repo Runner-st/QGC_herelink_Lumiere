@@ -310,10 +310,10 @@ Item {
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 10
                     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2.5
                     onClicked:              c12Controller.zoomOut()
-                    
+
                     // Auto-repeat when button is held down
                     property bool isHeld: false
-                    
+
                     Timer {
                         id:         zoomOutTimer
                         interval:   200
@@ -321,7 +321,7 @@ Item {
                         running:    parent.isHeld
                         onTriggered: c12Controller.zoomOut()
                     }
-                    
+
                     onPressedChanged: isHeld = pressed
                 }
 
@@ -330,10 +330,10 @@ Item {
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 10
                     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2.5
                     onClicked:              c12Controller.zoomIn()
-                    
+
                     // Auto-repeat when button is held down
                     property bool isHeld: false
-                    
+
                     Timer {
                         id:         zoomInTimer
                         interval:   200
@@ -341,8 +341,28 @@ Item {
                         running:    parent.isHeld
                         onTriggered: c12Controller.zoomIn()
                     }
-                    
+
                     onPressedChanged: isHeld = pressed
+                }
+            }
+
+            // Thermal Palette and Vert Controls Row
+            RowLayout {
+                spacing:            ScreenTools.defaultFontPixelWidth * 0.5
+                Layout.alignment:   Qt.AlignHCenter
+
+                QGCButton {
+                    text:                   "Palette"
+                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
+                    Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
+                    onClicked:              c12Controller.cyclePalette()
+                }
+
+                QGCButton {
+                    text:                   "Vert"
+                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 11
+                    Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
+                    onClicked:              c12Controller.sendVertCommand()
                 }
             }
         }

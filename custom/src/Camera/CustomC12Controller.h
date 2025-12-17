@@ -24,12 +24,15 @@ public:
     Q_INVOKABLE void centerTiltOnly();
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
+    Q_INVOKABLE void cyclePalette();
+    Q_INVOKABLE void sendVertCommand();
     Q_INVOKABLE void sendCustomCommand(const QString& command);
 
 private:
     void sendCommand(const QString& command);
-    
+
     QUdpSocket*     _udpSocket;
     QHostAddress    _cameraAddress;
     quint16         _cameraPort;
+    int             _currentPaletteIndex;
 };
