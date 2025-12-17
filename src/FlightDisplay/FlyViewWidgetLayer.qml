@@ -301,13 +301,14 @@ Item {
     Rectangle {
         id:                     c12MovementWidget
         anchors.margins:        _toolsMargin
-        anchors.left:           toolStrip.right
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.top:            parent.top
         width:                  ScreenTools.defaultFontPixelWidth * 5
         height:                 ScreenTools.defaultFontPixelHeight * 10
         color:                  Qt.rgba(0, 0, 0, 0.75)
         radius:                 ScreenTools.defaultFontPixelWidth * 0.5
         visible:                !QGroundControl.videoManager.fullScreen
+        z:                      QGroundControl.zOrderWidgets
 
         Column {
             anchors.centerIn:   parent
