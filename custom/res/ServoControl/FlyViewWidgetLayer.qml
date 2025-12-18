@@ -262,6 +262,7 @@ Item {
         anchors.leftMargin:     _toolsMargin
         anchors.bottomMargin:   _toolsMargin
         visible:                _servoController && _servoController.buttons.length > 0
+        opacity:                0.6
 
         // Maximum width is half the screen minus margins
         property real maxWidth: (parent.width / 2) - _toolsMargin
