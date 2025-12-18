@@ -1,11 +1,6 @@
-/****************************************************************************
+ /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
- *
- * Custom layer with C12 Camera Controls for Skydroid C12
+ * C12 Camera Controls for Skydroid C12
  *
  ****************************************************************************/
 
@@ -245,7 +240,7 @@ Item {
         color:          qgcPal.window
         border.color:   qgcPal.text
         border.width:   1
-        opacity:        0.75                   // More opaque (was 0.95)
+        opacity:        0.5                   // More opaque (was 0.95)
         visible:        _activeVehicle
         
         property var qgcPal: QGroundControl.globalPalette
@@ -380,16 +375,18 @@ Item {
         }
     }
 
-    // C12 Camera Movement Widget
+    // C12 Camera Movement Widget - positioned to the right of Fly Tools strip
     Rectangle {
         id:                     c12MovementWidget
         anchors.left:           parent.left
         anchors.top:            parent.top
-        anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.75 + parentToolInsets.leftEdgeCenterInset + ScreenTools.defaultFontPixelWidth * 4
-        anchors.topMargin:      ScreenTools.defaultFontPixelWidth * 0.75 + parentToolInsets.topEdgeLeftInset
+        //anchors.leftMargin:     parentToolInsets.leftEdgeTopInset + ScreenTools.defaultFontPixelWidth * 0.5
+        //anchors.topMargin:      ScreenTools.defaultFontPixelWidth * 0.75 + parentToolInsets.topEdgeLeftInset
+        anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 8
+        anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.4
         width:                  ScreenTools.defaultFontPixelHeight * 3
         height:                 ScreenTools.defaultFontPixelHeight * 10
-        color:                  Qt.rgba(0, 0, 0, 0.75)
+        color:                  Qt.rgba(0, 0, 0, 0.5)
         radius:                 ScreenTools.defaultFontPixelWidth * 0.5
         visible:                _activeVehicle && !QGroundControl.videoManager.fullScreen
         z:                      QGroundControl.zOrderWidgets
