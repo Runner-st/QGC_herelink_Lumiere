@@ -51,116 +51,131 @@ Item {
             font.pointSize: ScreenTools.defaultFontPointSize * 1.2
         }
 
-        QGCGroupBox {
+        RowLayout {
             Layout.fillWidth: true
-            title: _editingIndex >= 0 ? qsTr("Edit Button") : qsTr("Add Button")
+            Layout.fillHeight: true
+            spacing: ScreenTools.defaultFontPixelHeight
 
-            ColumnLayout {
-                anchors.margins: ScreenTools.defaultFontPixelHeight
-                anchors.fill: parent
-                spacing: ScreenTools.defaultFontPixelHeight / 2
+            // Left column: Add/Edit button form
+            QGCGroupBox {
+                Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignTop
+                title: _editingIndex >= 0 ? qsTr("Edit Button") : qsTr("Add Button")
 
-                QGCLabel { text: qsTr("Button name") }
-                QGCTextField {
-                    id: nameField
-                    Layout.fillWidth: true
-                }
+                ColumnLayout {
+                    anchors.margins: ScreenTools.defaultFontPixelHeight
+                    anchors.fill: parent
+                    spacing: ScreenTools.defaultFontPixelHeight / 2
 
-                QGCLabel { text: qsTr("Servo output") }
-                QGCTextField {
-                    id: outputField
-                    Layout.fillWidth: true
-                    inputMethodHints: Qt.ImhDigitsOnly
-                }
-
-                QGCLabel { text: qsTr("PWM pulse width (µs)") }
-                QGCTextField {
-                    id: pwmField
-                    Layout.fillWidth: true
-                    inputMethodHints: Qt.ImhDigitsOnly
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: ScreenTools.defaultFontPixelHeight
-
-                    QGCButton {
-                        text: _editingIndex >= 0 ? qsTr("Update") : qsTr("Add")
-                        enabled: nameField.text.length > 0 && outputField.text.length > 0 && pwmField.text.length > 0
-                        onClicked: saveButton()
+                    QGCLabel { text: qsTr("Button name") }
+                    QGCTextField {
+                        id: nameField
+                        Layout.fillWidth: true
                     }
 
-                    QGCButton {
-                        text: qsTr("Clear")
-                        visible: _editingIndex >= 0 || nameField.text.length > 0 || outputField.text.length > 0 || pwmField.text.length > 0
-                        onClicked: resetForm()
+                    QGCLabel { text: qsTr("Servo output") }
+                    QGCTextField {
+                        id: outputField
+                        Layout.fillWidth: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                    }
+
+                    QGCLabel { text: qsTr("PWM pulse width (µs)") }
+                    QGCTextField {
+                        id: pwmField
+                        Layout.fillWidth: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: ScreenTools.defaultFontPixelHeight
+
+                        QGCButton {
+                            text: _editingIndex >= 0 ? qsTr("Update") : qsTr("Add")
+                            enabled: nameField.text.length > 0 && outputField.text.length > 0 && pwmField.text.length > 0
+                            onClicked: saveButton()
+                        }
+
+                        QGCButton {
+                            text: qsTr("Clear")
+                            visible: _editingIndex >= 0 || nameField.text.length > 0 || outputField.text.length > 0 || pwmField.text.length > 0
+                            onClicked: resetForm()
+                        }
                     }
                 }
             }
-        }
 
-        QGCLabel {
-            text: qsTr("Configured buttons")
-            font.bold: true
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: Qt.rgba(0, 0, 0, 0.05)
-
-            ListView {
-                id: listView
-                anchors.fill: parent
-                model: controller ? controller.buttons : []
-                clip: true
-
-                delegate: Rectangle {
-                    width: listView.width
-                    height: Math.max(ScreenTools.defaultFontPixelHeight * 2.5, buttonRow.implicitHeight + ScreenTools.defaultFontPixelHeight)
-                    color: index % 2 === 0 ? Qt.rgba(0,0,0,0.02) : Qt.rgba(0,0,0,0)
-
-                    RowLayout {
-                        id: buttonRow
-                        anchors.fill: parent
-                        anchors.margins: ScreenTools.defaultFontPixelHeight / 2
-                        spacing: ScreenTools.defaultFontPixelHeight
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: ScreenTools.defaultFontPixelHeight / 4
-
-                            QGCLabel {
-                                text: modelData.name
-                                font.bold: true
-                            }
-
-                            QGCLabel {
-                                text: qsTr("Output %1 • %2 µs").arg(modelData.output).arg(modelData.pwm)
-                            }
-                        }
-
-                        QGCButton {
-                            text: qsTr("Edit")
-                            onClicked: {
-                                _editingIndex = index
-                                nameField.text = modelData.name
-                                outputField.text = modelData.output
-                                pwmField.text = modelData.pwm
-                            }
-                        }
-
-                        QGCButton {
-                            text: qsTr("Delete")
-                            onClicked: controller.removeButton(index)
-                        }
-                    }
-                }
+            // Right column: Configured buttons list
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: ScreenTools.defaultFontPixelHeight / 2
 
                 QGCLabel {
-                    anchors.centerIn: parent
-                    text: qsTr("No servo buttons configured")
-                    visible: (controller ? controller.buttons.length === 0 : true)
+                    text: qsTr("Configured buttons")
+                    font.bold: true
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: Qt.rgba(0, 0, 0, 0.05)
+
+                    ListView {
+                        id: listView
+                        anchors.fill: parent
+                        model: controller ? controller.buttons : []
+                        clip: true
+
+                        delegate: Rectangle {
+                            width: listView.width
+                            height: Math.max(ScreenTools.defaultFontPixelHeight * 2.5, buttonRow.implicitHeight + ScreenTools.defaultFontPixelHeight)
+                            color: index % 2 === 0 ? Qt.rgba(0,0,0,0.02) : Qt.rgba(0,0,0,0)
+
+                            RowLayout {
+                                id: buttonRow
+                                anchors.fill: parent
+                                anchors.margins: ScreenTools.defaultFontPixelHeight / 2
+                                spacing: ScreenTools.defaultFontPixelHeight
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: ScreenTools.defaultFontPixelHeight / 4
+
+                                    QGCLabel {
+                                        text: modelData.name
+                                        font.bold: true
+                                    }
+
+                                    QGCLabel {
+                                        text: qsTr("Output %1 • %2 µs").arg(modelData.output).arg(modelData.pwm)
+                                    }
+                                }
+
+                                QGCButton {
+                                    text: qsTr("Edit")
+                                    onClicked: {
+                                        _editingIndex = index
+                                        nameField.text = modelData.name
+                                        outputField.text = modelData.output
+                                        pwmField.text = modelData.pwm
+                                    }
+                                }
+
+                                QGCButton {
+                                    text: qsTr("Delete")
+                                    onClicked: controller.removeButton(index)
+                                }
+                            }
+                        }
+
+                        QGCLabel {
+                            anchors.centerIn: parent
+                            text: qsTr("No servo buttons configured")
+                            visible: (controller ? controller.buttons.length === 0 : true)
+                        }
+                    }
                 }
             }
         }
