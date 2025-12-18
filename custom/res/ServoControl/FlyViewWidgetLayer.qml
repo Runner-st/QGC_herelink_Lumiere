@@ -262,31 +262,46 @@ Item {
         anchors.leftMargin:     _toolsMargin
         anchors.bottomMargin:   _toolsMargin
         visible:                _servoController && _servoController.buttons.length > 0
+
+        // Maximum width is half the screen minus margins
+        property real maxWidth: (parent.width / 2) - _toolsMargin
         property real padding:  ScreenTools.defaultFontPixelHeight * 0.5
 
-        width:                  servoControlRow.implicitWidth + (padding * 2)
-        height:                 servoControlRow.implicitHeight + (padding * 2)
+        width:                  Math.min(servoControlFlow.implicitWidth + (padding * 2), maxWidth)
+        height:                 servoControlFlow.height + (padding * 2)
         z:                      QGroundControl.zOrderWidgets
 
-        Rectangle {
-            id: servoControlBackground
-            anchors.fill: parent
-            radius: ScreenTools.defaultFontPixelHeight * 0.6
-            color: Qt.rgba(0, 0, 0, 0.55)
-        }
+        // Flow container - uses vertical flip to make rows stack bottom-to-top
+        // First row stays at bottom, overflow rows appear above
+        Flow {
+            id:                     servoControlFlow
+            anchors.left:           parent.left
+            anchors.bottom:         parent.bottom
+            anchors.leftMargin:     servoControlBar.padding
+            anchors.bottomMargin:   servoControlBar.padding
+            width:                  servoControlBar.maxWidth - (servoControlBar.padding * 2)
+            spacing:                ScreenTools.defaultFontPixelWidth
+            flow:                   Flow.LeftToRight
+            layoutDirection:        Qt.LeftToRight
 
-        Row {
-            id:         servoControlRow
-            anchors.left:   parent.left
-            anchors.leftMargin: servoControlBar.padding
-            anchors.verticalCenter: parent.verticalCenter
-            spacing:    ScreenTools.defaultFontPixelWidth
+            // Flip the Flow vertically so rows stack from bottom to top
+            transform: Scale {
+                origin.x: 0
+                origin.y: servoControlFlow.height / 2
+                yScale: -1
+            }
 
             Repeater {
                 model: _servoController ? _servoController.buttons : []
                 QGCButton {
                     text: modelData.name
                     onClicked: _servoController.triggerButton(index)
+                    // Flip each button back so text is right-side up
+                    transform: Scale {
+                        origin.x: 0
+                        origin.y: height / 2
+                        yScale: -1
+                    }
                 }
             }
         }
