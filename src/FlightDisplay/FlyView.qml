@@ -165,14 +165,14 @@ Item {
     QGCPipOverlay {
         id:                     _pipOverlay
         anchors.left:           parent.left
-        anchors.bottom:         parent.bottom
-        anchors.margins:        _toolsMargin + widgetLayer.servoBottomInset
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin:     _toolsMargin
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
         item1:                  mapControl
         item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
-        // Map PiP is disabled for the main Fly View window
-        show:                   false
+        show:                   !QGroundControl.videoManager.fullScreen &&
+                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
     }
 }
