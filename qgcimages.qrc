@@ -96,6 +96,7 @@
         <file alias="GeoTagIcon">src/AnalyzeView/GeoTagIcon.svg</file>
         <file alias="Gps.svg">src/ui/toolbar/Images/Gps.svg</file>
         <file alias="Hamburger.svg">src/ui/toolbar/Images/Hamburger.svg</file>
+        <file alias="SettingsWhite.svg">src/ui/toolbar/Images/SettingsWhite.svg</file>
         <file alias="Help.svg">src/FlightMap/Images/Help.svg</file>
         <file alias="HelpBlack.svg">src/FlightMap/Images/HelpBlack.svg</file>
         <file alias="HITL.svg">src/AutoPilotPlugins/PX4/Images/HITL.svg</file>
