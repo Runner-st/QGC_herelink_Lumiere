@@ -2,6 +2,7 @@
 
 #include "HerelinkOptions.h"
 #include "ServoControlController.h"
+#include "GimbalControlController.h"
 
 #include "QGCCorePlugin.h"
 #include "QGCLoggingCategory.h"
@@ -22,8 +23,10 @@ public:
 
     Q_PROPERTY(bool isHerelink READ isHerelink CONSTANT)
     Q_PROPERTY(ServoControlController* servoControlController READ servoControlController CONSTANT)
+    Q_PROPERTY(GimbalControlController* gimbalControlController READ gimbalControlController CONSTANT)
     bool isHerelink (void) const { return true; }
     ServoControlController* servoControlController() const { return _servoControlController; }
+    GimbalControlController* gimbalControlController() const { return _gimbalControlController; }
 
     // Overrides from QGCCorePlugin
     QGCOptions* options                                (void) override { return qobject_cast<QGCOptions*>(_herelinkOptions); }
@@ -55,7 +58,9 @@ private:
     QmlComponentInfo*         _settingsPalette        = nullptr;
 #endif
     QmlComponentInfo*         _settingsServoControl   = nullptr;
+    QmlComponentInfo*         _settingsGimbalControl  = nullptr;
 
     HerelinkOptions*          _herelinkOptions        = nullptr;
     ServoControlController*   _servoControlController = nullptr;
+    GimbalControlController*  _gimbalControlController = nullptr;
 };

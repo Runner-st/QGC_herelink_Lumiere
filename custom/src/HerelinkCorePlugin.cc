@@ -29,8 +29,12 @@ void HerelinkCorePlugin::setToolbox(QGCToolbox* toolbox)
     qmlRegisterUncreatableType<ServoControlController>("QGroundControl.ServoControl", 1, 0, "ServoControlController", "Reference only");
     qmlRegisterUncreatableType<ServoControlSettings>("QGroundControl.ServoControl", 1, 0, "ServoControlSettings", "Reference only");
 
+    qmlRegisterUncreatableType<GimbalControlController>("QGroundControl.GimbalControl", 1, 0, "GimbalControlController", "Reference only");
+    qmlRegisterUncreatableType<GimbalControlSettings>("QGroundControl.GimbalControl", 1, 0, "GimbalControlSettings", "Reference only");
+
     _herelinkOptions = new HerelinkOptions(this, nullptr);
     _servoControlController = new ServoControlController(this);
+    _gimbalControlController = new GimbalControlController(this);
 
     auto multiVehicleManager = qgcApp()->toolbox()->multiVehicleManager();
     connect(multiVehicleManager, &MultiVehicleManager::activeVehicleChanged, this, &HerelinkCorePlugin::_activeVehicleChanged);
@@ -50,6 +54,9 @@ QVariantList& HerelinkCorePlugin::settingsPages()
 
     _settingsServoControl = new QmlComponentInfo(tr("Servo Control"), QUrl::fromUserInput("qrc:/qml/ServoControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
     _settingsList.append(QVariant::fromValue(_settingsServoControl));
+
+    _settingsGimbalControl = new QmlComponentInfo(tr("Gimbal Control"), QUrl::fromUserInput("qrc:/qml/GimbalControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
+    _settingsList.append(QVariant::fromValue(_settingsGimbalControl));
 
     _settingsOfflineMaps = new QmlComponentInfo(tr("Offline Maps"), QUrl::fromUserInput("qrc:/qml/OfflineMap.qml"), QUrl::fromUserInput("qrc:/res/waves.svg"), this);
     _settingsList.append(QVariant::fromValue(_settingsOfflineMaps));

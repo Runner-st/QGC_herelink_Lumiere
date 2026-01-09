@@ -20,7 +20,7 @@ win32 {
 } else {
     CUSTOM_QGC_VER_BUILD = $$system("echo $(($$CUSTOM_QGC_VER_BUILD - $$CUSTOM_QGC_VER_FIRST_BUILD))")
 }
-CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1019
+CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1100
 
 DEFINES -= APP_VERSION_STR=\"\\\"$$APP_VERSION_STR\\\"\"
 DEFINES += APP_VERSION_STR=\"\\\"$$CUSTOM_QGC_VERSION\\\"\"
@@ -72,12 +72,16 @@ SOURCES += \
     $$PWD/src/HerelinkOptions.cc \
     $$PWD/src/ServoControlController.cc \
     $$PWD/src/ServoControlSettings.cc \
+    $$PWD/src/GimbalControlController.cc \
+    $$PWD/src/GimbalControlSettings.cc \
 
 HEADERS += \
     $$PWD/src/HerelinkCorePlugin.h \
     $$PWD/src/HerelinkOptions.h \
     $$PWD/src/ServoControlController.h \
     $$PWD/src/ServoControlSettings.h \
+    $$PWD/src/GimbalControlController.h \
+    $$PWD/src/GimbalControlSettings.h \
 
 INCLUDEPATH += \
     $$PWD/src \

@@ -43,6 +43,7 @@ Item {
     property var    _rallyPointController:  _planMasterController.rallyPointController
     property var    _guidedController:      globals.guidedControllerFlyView
     property var    _servoController:       QGroundControl.corePlugin.servoControlController
+    property var    _gimbalController:      QGroundControl.corePlugin.gimbalControlController
     property real   _margins:               ScreenTools.defaultFontPixelWidth / 2
     property real   _toolsMargin:           ScreenTools.defaultFontPixelWidth * 0.75
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
@@ -50,6 +51,7 @@ Item {
     property alias  _gripperMenu:           gripperOptions
 
     property real servoBottomInset: servoControlBar.visible ? (_root.height - servoControlBar.y) : 0
+    property real gimbalTopInset: gimbalControlBar.visible ? (gimbalControlBar.y + gimbalControlBar.height + _toolsMargin) : 0
 
     QGCToolInsets {
         id:                     _totalToolInsets
@@ -60,7 +62,7 @@ Item {
         rightEdgeCenterInset:   (telemetryPanel.rightEdgeCenterInset > photoVideoControl.rightEdgeCenterInset) ? telemetryPanel.rightEdgeCenterInset : photoVideoControl.rightEdgeCenterInset
         rightEdgeBottomInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.rightEdgeBottomInset : parentToolInsets.rightEdgeBottomInset
         topEdgeLeftInset:       toolStrip.topEdgeLeftInset
-        topEdgeCenterInset:     mapScale.topEdgeCenterInset
+        topEdgeCenterInset:     Math.max(mapScale.topEdgeCenterInset, gimbalTopInset)
         topEdgeRightInset:      instrumentPanel.topEdgeRightInset
         bottomEdgeLeftInset: {
             var inset = virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
@@ -287,6 +289,49 @@ Item {
                 QGCButton {
                     text: modelData.name
                     onClicked: _servoController.triggerButton(index)
+                }
+            }
+        }
+    }
+
+    Item {
+        id:                         gimbalControlBar
+        anchors.top:                parent.top
+        anchors.horizontalCenter:   parent.horizontalCenter
+        anchors.topMargin:          _toolsMargin
+        visible:                    _activeVehicle && _gimbalController && _gimbalController.pitchButtons.length > 0
+        property real padding:      ScreenTools.defaultFontPixelHeight * 0.5
+
+        width:                      gimbalControlRow.implicitWidth + (padding * 2)
+        height:                     gimbalControlRow.implicitHeight + (padding * 2)
+        z:                          QGroundControl.zOrderWidgets
+
+        Rectangle {
+            id: gimbalControlBackground
+            anchors.fill: parent
+            radius: ScreenTools.defaultFontPixelHeight * 0.6
+            color: qgcPal.window
+            opacity: 0.9
+        }
+
+        Row {
+            id:         gimbalControlRow
+            anchors.centerIn: parent
+            spacing:    ScreenTools.defaultFontPixelWidth
+
+            QGCButton {
+                text: qsTr("Reset Level")
+                height: ScreenTools.defaultFontPixelHeight * 2.5
+                primary: true
+                onClicked: _gimbalController.resetGimbalToLevel()
+            }
+
+            Repeater {
+                model: _gimbalController ? _gimbalController.pitchButtons : []
+                QGCButton {
+                    text: modelData.label
+                    height: ScreenTools.defaultFontPixelHeight * 2.5
+                    onClicked: _gimbalController.triggerPitchButton(index)
                 }
             }
         }
