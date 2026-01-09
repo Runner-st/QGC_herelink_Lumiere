@@ -138,12 +138,14 @@ Item {
 
                         delegate: Rectangle {
                             width: buttonListView.width
-                            height: buttonLayout.height + ScreenTools.defaultFontPixelHeight
+                            height: buttonLayout.implicitHeight + ScreenTools.defaultFontPixelHeight
                             color: index % 2 === 0 ? qgcPal.window : qgcPal.windowShade
 
                             RowLayout {
                                 id: buttonLayout
-                                anchors.fill: parent
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
                                 anchors.margins: ScreenTools.defaultFontPixelHeight / 2
                                 spacing: ScreenTools.defaultFontPixelWidth
 

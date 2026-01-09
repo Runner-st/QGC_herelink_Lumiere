@@ -320,8 +320,8 @@ Item {
             spacing:    ScreenTools.defaultFontPixelWidth
 
             QGCButton {
-                text: qsTr("Reset Level")
-                height: ScreenTools.defaultFontPixelHeight * 2.5
+                text: "0"
+                height: ScreenTools.defaultFontPixelHeight * 1.5
                 primary: true
                 onClicked: _gimbalController.resetGimbalToLevel()
             }
@@ -330,7 +330,7 @@ Item {
                 model: _gimbalController ? _gimbalController.pitchButtons : []
                 QGCButton {
                     text: modelData.label
-                    height: ScreenTools.defaultFontPixelHeight * 2.5
+                    height: ScreenTools.defaultFontPixelHeight * 1.5
                     onClicked: _gimbalController.triggerPitchButton(index)
                 }
             }
