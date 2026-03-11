@@ -561,8 +561,8 @@ GstVideoReceiver::startRecording(const QString& videoFile, FILE_FORMAT format)
         });
         return;
     }
-
-    gst_pad_add_probe(probepad, GST_PAD_PROBE_TYPE_BUFFER, _keyframeWatch, this, nullptr); // to drop the buffers until key frame is received
+    g_object_set(_recorderValve, "drop", FALSE, nullptr);
+    // gst_pad_add_probe(probepad, GST_PAD_PROBE_TYPE_BUFFER, _keyframeWatch, this, nullptr); // to drop the buffers until key frame is received
     gst_object_unref(probepad);
     probepad = nullptr;
 
@@ -631,7 +631,7 @@ GstVideoReceiver::takeScreenshot(const QString& imageFile)
 const char* GstVideoReceiver::_kFileMux[FILE_FORMAT_MAX - FILE_FORMAT_MIN] = {
     "matroskamux",
     "qtmux",
-    "mp4mux"
+    "avmux_mp4"
 };
 
 void
@@ -934,81 +934,117 @@ GstVideoReceiver::_makeFileSink(const QString& videoFile, FILE_FORMAT format)
     GstElement* mux = nullptr;
     GstElement* sink = nullptr;
     GstElement* bin = nullptr;
+    GstElement* parser = nullptr;
+    GstElement* identity = nullptr;
     bool releaseElements = true;
 
-    do{
+    do {
+
         if (format < FILE_FORMAT_MIN || format >= FILE_FORMAT_MAX) {
             qCCritical(VideoReceiverLog) << "Unsupported file format";
             break;
         }
 
-        if ((mux = gst_element_factory_make(_kFileMux[format - FILE_FORMAT_MIN], nullptr)) == nullptr) {
-            qCCritical(VideoReceiverLog) << "gst_element_factory_make('" << _kFileMux[format - FILE_FORMAT_MIN] << "') failed";
+        mux = gst_element_factory_make(_kFileMux[format - FILE_FORMAT_MIN], nullptr);
+        if (!mux) {
+            qCCritical(VideoReceiverLog) << "mux create failed";
             break;
         }
 
-        if ((sink = gst_element_factory_make("filesink", nullptr)) == nullptr) {
-            qCCritical(VideoReceiverLog) << "gst_element_factory_make('filesink') failed";
+        sink = gst_element_factory_make("filesink", nullptr);
+        if (!sink) {
+            qCCritical(VideoReceiverLog) << "filesink create failed";
             break;
         }
 
-        g_object_set(static_cast<gpointer>(sink), "location", qPrintable(videoFile), nullptr);
+        g_object_set(sink, "location", qPrintable(videoFile), nullptr);
 
-        if ((bin = gst_bin_new("sinkbin")) == nullptr) {
-            qCCritical(VideoReceiverLog) << "gst_bin_new('sinkbin') failed";
+        bin = gst_bin_new("sinkbin");
+        if (!bin) {
+            qCCritical(VideoReceiverLog) << "bin create failed";
             break;
         }
 
-        GstPadTemplate* padTemplate;
-
-        if ((padTemplate = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(mux), "video_%u")) == nullptr) {
-            qCCritical(VideoReceiverLog) << "gst_element_class_get_pad_template(mux) failed";
+        parser = gst_element_factory_make("h265parse", nullptr);
+        if (!parser) {
+            qCCritical(VideoReceiverLog) << "parser create failed";
             break;
         }
 
-        // FIXME: AV: pad handling is potentially leaking (and other similar places too!)
-        GstPad* pad;
+        g_object_set(parser,
+                     "config-interval", 1,
+                     nullptr);
 
-        if ((pad = gst_element_request_pad(mux, padTemplate, nullptr, nullptr)) == nullptr) {
-            qCCritical(VideoReceiverLog) << "gst_element_request_pad(mux) failed";
+        identity = gst_element_factory_make("identity", nullptr);
+        if (!identity) {
+            qCCritical(VideoReceiverLog) << "identity create failed";
             break;
         }
 
-        gst_bin_add_many(GST_BIN(bin), mux, sink, nullptr);
+        g_object_set(identity,
+                     "sync", TRUE,
+                     "single-segment", TRUE,
+                     nullptr);
 
-        releaseElements = false;
+        gst_bin_add_many(GST_BIN(bin),
+                         parser,
+                         identity,
+                         mux,
+                         sink,
+                         nullptr);
+
+        if (!gst_element_link_many(parser, identity, mux, sink, nullptr)) {
+            qCCritical(VideoReceiverLog) << "link failed";
+            break;
+        }
+
+        GstPad* pad = gst_element_get_static_pad(parser, "sink");
+        if (!pad) {
+            qCCritical(VideoReceiverLog) << "parser sink pad failed";
+            break;
+        }
 
         GstPad* ghostpad = gst_ghost_pad_new("sink", pad);
-
-        gst_element_add_pad(bin, ghostpad);
-
         gst_object_unref(pad);
-        pad = nullptr;
 
-        if (!gst_element_link(mux, sink)) {
-            qCCritical(VideoReceiverLog) << "gst_element_link() failed";
+        if (!ghostpad) {
+            qCCritical(VideoReceiverLog) << "ghostpad failed";
+            break;
+        }
+
+        if (!gst_element_add_pad(bin, ghostpad)) {
+            qCCritical(VideoReceiverLog) << "ghostpad add failed";
+            gst_object_unref(ghostpad);
             break;
         }
 
         fileSink = bin;
         bin = nullptr;
-    } while(0);
+        releaseElements = false;
+
+    } while (0);
 
     if (releaseElements) {
-        if (sink != nullptr) {
-            gst_object_unref(sink);
-            sink = nullptr;
+
+        if (parser) {
+            gst_object_unref(parser);
         }
 
-        if (mux != nullptr) {
+        if (identity) {
+            gst_object_unref(identity);
+        }
+
+        if (sink) {
+            gst_object_unref(sink);
+        }
+
+        if (mux) {
             gst_object_unref(mux);
-            mux = nullptr;
         }
     }
 
-    if (bin != nullptr) {
+    if (bin) {
         gst_object_unref(bin);
-        bin = nullptr;
     }
 
     return fileSink;
