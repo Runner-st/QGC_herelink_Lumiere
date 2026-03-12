@@ -116,6 +116,7 @@ protected:
     virtual bool _unlinkBranch(GstElement* from);
     virtual void _shutdownDecodingBranch (void);
     virtual void _shutdownRecordingBranch(void);
+    virtual void _scanMedia(const QString& path);
 
     bool _needDispatch(void);
     void _dispatchSignal(std::function<void()> emitter);
@@ -167,6 +168,8 @@ protected:
     bool                _endOfStream;
 
     static const char*  _kFileMux[FILE_FORMAT_MAX - FILE_FORMAT_MIN];
+
+    QString _lastRecordedFile;
 };
 
 void* createVideoSink(void* widget);

@@ -292,11 +292,17 @@ QString AppSettings::logSavePath(void)
 
 QString AppSettings::videoSavePath(void)
 {
-    QString path = savePath()->rawValue().toString();
-    if (!path.isEmpty() && QDir(path).exists()) {
-        QDir dir(path);
-        return dir.filePath(videoDirectory);
+    // QString path = savePath()->rawValue().toString();
+    // if (!path.isEmpty() && QDir(path).exists()) {
+    //     QDir dir(path);
+    //     return dir.filePath(videoDirectory);
+    // }
+    QString path = "/storage/emulated/0/DCIM";
+
+    if (QDir(path).exists()) {
+        return path;
     }
+
     return QString();
 }
 

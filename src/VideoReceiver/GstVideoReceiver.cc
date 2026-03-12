@@ -569,6 +569,7 @@ GstVideoReceiver::startRecording(const QString& videoFile, FILE_FORMAT format)
     g_object_set(_recorderValve, "drop", FALSE, nullptr);
 
     _recording = true;
+    _lastRecordedFile = videoFile;
     qCDebug(VideoReceiverLog) << "Recording started" << _uri;
     _dispatchSignal([this](){
         emit onStartRecordingComplete(STATUS_OK);
@@ -748,6 +749,107 @@ GstVideoReceiver::_filterParserCaps(GstElement* bin, GstPad* pad, GstElement* el
     return TRUE;
 }
 
+static void dumpGObjectProperties(GObject* obj, const char* label)
+{
+    if (!obj) {
+        qCInfo(VideoReceiverLog) << label << ": null";
+        return;
+    }
+
+    guint nProps = 0;
+    GParamSpec** props = g_object_class_list_properties(G_OBJECT_GET_CLASS(obj), &nProps);
+
+    qCInfo(VideoReceiverLog) << "Properties for" << label << ":" << nProps;
+
+    for (guint i = 0; i < nProps; ++i) {
+        GParamSpec* pspec = props[i];
+        const char* propName = g_param_spec_get_name(pspec);
+        GType valueType = G_PARAM_SPEC_VALUE_TYPE(pspec);
+
+        GValue value = G_VALUE_INIT;
+        g_value_init(&value, valueType);
+
+        g_object_get_property(obj, propName, &value);
+
+        QString out;
+
+        if (G_VALUE_HOLDS_STRING(&value)) {
+            const gchar* s = g_value_get_string(&value);
+            out = s ? QString::fromUtf8(s) : "<null>";
+        } else if (G_VALUE_HOLDS_BOOLEAN(&value)) {
+            out = g_value_get_boolean(&value) ? "true" : "false";
+        } else if (G_VALUE_HOLDS_INT(&value)) {
+            out = QString::number(g_value_get_int(&value));
+        } else if (G_VALUE_HOLDS_UINT(&value)) {
+            out = QString::number(g_value_get_uint(&value));
+        } else if (G_VALUE_HOLDS_INT64(&value)) {
+            out = QString::number(g_value_get_int64(&value));
+        } else if (G_VALUE_HOLDS_UINT64(&value)) {
+            out = QString::number(g_value_get_uint64(&value));
+        } else if (G_VALUE_HOLDS_FLOAT(&value)) {
+            out = QString::number(g_value_get_float(&value));
+        } else if (G_VALUE_HOLDS_DOUBLE(&value)) {
+            out = QString::number(g_value_get_double(&value));
+        } else if (G_VALUE_HOLDS_CHAR(&value)) {
+            out = QString("'%1' (%2)")
+            .arg(QChar(g_value_get_schar(&value)))
+                .arg(g_value_get_schar(&value));
+        } else if (G_VALUE_HOLDS_UCHAR(&value)) {
+            out = QString::number(g_value_get_uchar(&value));
+        } else if (G_VALUE_HOLDS_ENUM(&value)) {
+            gint enumVal = g_value_get_enum(&value);
+            GEnumClass* enumClass = G_ENUM_CLASS(g_type_class_ref(valueType));
+            if (enumClass) {
+                GEnumValue* enumInfo = g_enum_get_value(enumClass, enumVal);
+                if (enumInfo) {
+                    out = QString("%1 (%2)")
+                    .arg(enumInfo->value_nick)
+                        .arg(enumVal);
+                } else {
+                    out = QString::number(enumVal);
+                }
+                g_type_class_unref(enumClass);
+            } else {
+                out = QString::number(enumVal);
+            }
+        } else if (G_VALUE_HOLDS_FLAGS(&value)) {
+            guint flagsVal = g_value_get_flags(&value);
+            out = QString("0x%1").arg(flagsVal, 0, 16);
+        } else if (G_VALUE_HOLDS_OBJECT(&value)) {
+            GObject* childObj = G_OBJECT(g_value_get_object(&value));
+            if (childObj) {
+                out = QString("<GObject type=%1 ptr=%2>")
+                .arg(g_type_name_from_instance((GTypeInstance*)childObj))
+                    .arg(reinterpret_cast<quintptr>(childObj), 0, 16);
+            } else {
+                out = "<null object>";
+            }
+        } else if (G_VALUE_HOLDS_POINTER(&value)) {
+            gpointer ptr = g_value_get_pointer(&value);
+            out = QString("<pointer 0x%1>")
+                      .arg(reinterpret_cast<quintptr>(ptr), 0, 16);
+        } else {
+            gchar* contents = g_strdup_value_contents(&value);
+            if (contents) {
+                out = QString("%1").arg(contents);
+                g_free(contents);
+            } else {
+                out = QString("<unsupported type: %1>")
+                .arg(g_type_name(valueType));
+            }
+        }
+
+        qCInfo(VideoReceiverLog)
+            << " " << propName
+            << "[" << g_type_name(valueType) << "]"
+            << "=" << out;
+
+        g_value_unset(&value);
+    }
+
+    g_free(props);
+}
+
 GstElement*
 GstVideoReceiver::_makeSource(const QString& uri)
 {
@@ -780,6 +882,7 @@ GstVideoReceiver::_makeSource(const QString& uri)
         } else if (isRtsp) {
             if ((source = gst_element_factory_make("rtspsrc", "source")) != nullptr) {
                 g_object_set(static_cast<gpointer>(source), "location", qPrintable(uri), "latency", 17, "udp-reconnect", 1, "timeout", _udpReconnect_us, NULL);
+                dumpGObjectProperties(G_OBJECT(source), "rtspsrc");
             }
         } else if(isUdp264 || isUdp265 || isUdpMPEGTS || isTaisync) {
             if ((source = gst_element_factory_make("udpsrc", "source")) != nullptr) {
@@ -965,7 +1068,7 @@ GstVideoReceiver::_makeFileSink(const QString& videoFile, FILE_FORMAT format)
             break;
         }
 
-        parser = gst_element_factory_make("h265parse", nullptr);
+        parser = gst_element_factory_make("h264parse", nullptr);
         if (!parser) {
             qCCritical(VideoReceiverLog) << "parser create failed";
             break;
@@ -1355,6 +1458,10 @@ GstVideoReceiver::_shutdownRecordingBranch(void)
     gst_bin_remove(GST_BIN(_pipeline), _fileSink);
     gst_element_set_state(_fileSink, GST_STATE_NULL);
     gst_object_unref(_fileSink);
+
+    if (QFile::exists(_lastRecordedFile)) {
+        _scanMedia(_lastRecordedFile);
+    }
     _fileSink = nullptr;
 
     _removingRecorder = false;
@@ -1650,3 +1757,50 @@ GstVideoReceiver::_keyframeWatch(GstPad* pad, GstPadProbeInfo* info, gpointer us
 
     return GST_PAD_PROBE_REMOVE;
 }
+
+
+
+
+
+
+#ifdef Q_OS_ANDROID
+#include <QAndroidJniObject>
+
+void GstVideoReceiver::_scanMedia(const QString& path)
+{
+    QString uri = "file://" + path;
+
+    QAndroidJniObject action = QAndroidJniObject::fromString(
+        "android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+
+    QAndroidJniObject uriObj = QAndroidJniObject::callStaticObjectMethod(
+        "android/net/Uri",
+        "parse",
+        "(Ljava/lang/String;)Landroid/net/Uri;",
+        QAndroidJniObject::fromString(uri).object<jstring>());
+
+    QAndroidJniObject intent(
+        "android/content/Intent",
+        "(Ljava/lang/String;Landroid/net/Uri;)V",
+        action.object<jstring>(),
+        uriObj.object());
+
+    QAndroidJniObject activity =
+        QAndroidJniObject::callStaticObjectMethod(
+            "org/qtproject/qt5/android/QtNative",
+            "activity",
+            "()Landroid/app/Activity;");
+
+    activity.callMethod<void>(
+        "sendBroadcast",
+        "(Landroid/content/Intent;)V",
+        intent.object());
+
+    qCInfo(VideoReceiverLog) << "try to save" << uri;
+}
+#else
+void GstVideoReceiver::_scanMedia(const QString& path)
+{
+    Q_UNUSED(path)
+}
+#endif
