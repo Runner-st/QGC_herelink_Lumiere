@@ -297,11 +297,12 @@ QString AppSettings::videoSavePath(void)
     //     QDir dir(path);
     //     return dir.filePath(videoDirectory);
     // }
-    QString path = "/storage/sdcard0/DCIM";
+    QString path = "/storage/emulated/0/DCIM";
 
-    if (!path.isEmpty() && QDir(path).exists()) {
+    if (QDir(path).exists()) {
         return path;
     }
+
     return QString();
 }
 
