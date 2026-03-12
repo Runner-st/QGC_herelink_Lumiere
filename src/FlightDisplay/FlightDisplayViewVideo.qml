@@ -35,6 +35,8 @@ Item {
     property var    _camera:            _isCamera ? _dynamicCameras.cameras.get(_curCameraIndex) : null
     property bool   _hasZoom:           _camera && _camera.hasZoom
     property int    _fitMode:           QGroundControl.settingsManager.videoSettings.videoFit.rawValue
+    property var    _videoStreamSettings:                       QGroundControl.settingsManager.videoSettings
+
 
     function getWidth() {
         return videoBackground.getWidth()
@@ -150,6 +152,34 @@ Item {
             sourceComponent:    videoBackgroundComponent
 
             property bool videoDisabled: QGroundControl.settingsManager.videoSettings.videoSource.rawValue === QGroundControl.settingsManager.videoSettings.disabledVideoSource
+        }
+
+        Item {
+            id: centerCross
+            anchors.centerIn: parent
+            width: 30
+            height: 30
+            z: 1000
+
+            visible: (_videoStreamSettings.cameraId.rawValue === 0)
+
+            // вертикальна лінія
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                width: 2
+                height: parent.height
+                color: "lime"
+            }
+
+            // горизонтальна лінія
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
+                height: 2
+                color: "lime"
+            }
         }
 
         //-- Thermal Image
