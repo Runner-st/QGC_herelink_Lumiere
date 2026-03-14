@@ -44,9 +44,9 @@ QGC_LOGGING_CATEGORY(VideoManagerLog, "VideoManagerLog")
 
 #if defined(QGC_GST_STREAMING)
 static const char* kFileExtension[VideoReceiver::FILE_FORMAT_MAX - VideoReceiver::FILE_FORMAT_MIN] = {
-    "mkv",
-    "mov",
-    "mp4"
+    "mp4",
+    "mov"
+    "mkv"
 };
 #endif
 
@@ -814,13 +814,22 @@ VideoManager::_restartVideo(unsigned id)
     bool newLowLatencyStreaming = _lowLatencyStreaming[id];
     QString newUri = _videoUri[id];
     qCDebug(VideoManagerLog) << "New Video URI " << newUri;
+    qDebug() << "_restartVideo " << id;
+    qDebug() << "_videoStarted[id] " << _videoStarted[id];
+    qDebug() << "Old Video URI " << oldUri;
+    qDebug() << "New Video URI " << newUri;
+    qDebug() << "oldLowLatencyStreaming " << oldLowLatencyStreaming;
+    qDebug() << "newLowLatencyStreaming " << newLowLatencyStreaming;
+
     // FIXME: AV: use _updateSettings() result to check if settings were changed
     if (_videoStarted[id] && oldUri == newUri && oldLowLatencyStreaming == newLowLatencyStreaming) {
         qCDebug(VideoManagerLog) << "No sense to restart video streaming, skipped"  << id;
+        qDebug() << "No sense to restart video streaming, skipped"  << id;
         return;
     }
 
     qCDebug(VideoManagerLog) << "Restart video streaming"  << id;
+    qDebug() << "Restart video streaming"  << id;
 
     if (_videoStarted[id]) {
         _stopReceiver(id);

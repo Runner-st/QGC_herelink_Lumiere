@@ -25,6 +25,7 @@ signals:
 private slots:
     void _mavlinkMessageReceived(LinkInterface *link, mavlink_message_t message);
     void _settingInProgressTimeout();
+    void _settingInProgressAckTimeout();
     void _cameraIdChanged();
 
 private:
@@ -33,6 +34,7 @@ private:
     MAVLinkProtocol *_mavlinkProtocol;
     VideoSettings *_videoSettings;
     QTimer _settingInProgressTimer;
+    QTimer _settingInProgressTimerAck;
     uint32_t _cameraServiceUid;
     uint32_t _cameraCount;
     uint32_t _cameraIdSetting;

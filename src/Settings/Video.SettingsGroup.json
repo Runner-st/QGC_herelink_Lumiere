@@ -77,7 +77,7 @@
     "shortDesc": "Video Recording Format",
     "longDesc":  "Video recording file format.",
     "type":             "uint32",
-    "enumStrings":      "mkv,mov,mp4",
+    "enumStrings":      "mp4,mov,mkv",
     "enumValues":       "0,1,2",
     "default":     0
 },

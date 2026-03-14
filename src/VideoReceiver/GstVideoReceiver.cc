@@ -630,9 +630,9 @@ GstVideoReceiver::takeScreenshot(const QString& imageFile)
 }
 
 const char* GstVideoReceiver::_kFileMux[FILE_FORMAT_MAX - FILE_FORMAT_MIN] = {
-    "matroskamux",
+    "avmux_mp4",
     "qtmux",
-    "avmux_mp4"
+    "matroskamux"
 };
 
 void
@@ -881,7 +881,7 @@ GstVideoReceiver::_makeSource(const QString& uri)
             }
         } else if (isRtsp) {
             if ((source = gst_element_factory_make("rtspsrc", "source")) != nullptr) {
-                g_object_set(static_cast<gpointer>(source), "location", qPrintable(uri), "latency", 17, "udp-reconnect", 1, "timeout", _udpReconnect_us, NULL);
+                g_object_set(static_cast<gpointer>(source), "location", qPrintable(uri), "latency", 100, "drop-on-latency", true, "protocols", 0x4, "udp-reconnect", 1, "timeout", _udpReconnect_us, NULL);
                 dumpGObjectProperties(G_OBJECT(source), "rtspsrc");
             }
         } else if(isUdp264 || isUdp265 || isUdpMPEGTS || isTaisync) {
