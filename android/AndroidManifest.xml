@@ -75,6 +75,15 @@
             <!-- extract android style -->
         </activity>
         <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
+        <service android:name="org.mavlink.qgroundcontrol.HerelinkNotificationService"
+                 android:label="Herelink Telemetry"
+                 android:process=":herelink"
+                 android:exported="true"
+                 android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
     </application>
 
     <uses-sdk android:targetSdkVersion="33"/>

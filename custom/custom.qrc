@@ -7,4 +7,9 @@
     </qresource>
     <qresource prefix="/qml">
     </qresource>
+    <qresource prefix="/custom/qml">
+        <file alias="HerelinkControllerSignalIndicator.qml">qml/HerelinkControllerSignalIndicator.qml</file>
+        <file alias="HerelinkAirSignalIndicator.qml">qml/HerelinkAirSignalIndicator.qml</file>
+        <file alias="HerelinkFlyDistanceIndicator.qml">qml/HerelinkFlyDistanceIndicator.qml</file>
+    </qresource>
 </RCC>

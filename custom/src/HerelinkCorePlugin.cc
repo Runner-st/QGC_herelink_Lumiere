@@ -1,4 +1,5 @@
 #include "HerelinkCorePlugin.h"
+#include "HerelinkTelemetry.h"
 
 #include "AutoConnectSettings.h"
 #include "VideoSettings.h"
@@ -32,12 +33,36 @@ void HerelinkCorePlugin::setToolbox(QGCToolbox* toolbox)
     qmlRegisterUncreatableType<GimbalControlController>("QGroundControl.GimbalControl", 1, 0, "GimbalControlController", "Reference only");
     qmlRegisterUncreatableType<GimbalControlSettings>("QGroundControl.GimbalControl", 1, 0, "GimbalControlSettings", "Reference only");
 
+    // Ensure the HerelinkTelemetry singleton instance exists before QML accesses it.
+    (void)new HerelinkTelemetry(this);
+
+    qmlRegisterSingletonType<HerelinkTelemetry>(
+        "QGroundControl.Herelink", 1, 0, "HerelinkTelemetry",
+        [](QQmlEngine*, QJSEngine*) -> QObject* {
+            QObject* inst = HerelinkTelemetry::instance();
+            QQmlEngine::setObjectOwnership(inst, QQmlEngine::CppOwnership);
+            return inst;
+        });
+
     _herelinkOptions = new HerelinkOptions(this, nullptr);
     _servoControlController = new ServoControlController(this);
     _gimbalControlController = new GimbalControlController(this);
 
     auto multiVehicleManager = qgcApp()->toolbox()->multiVehicleManager();
     connect(multiVehicleManager, &MultiVehicleManager::activeVehicleChanged, this, &HerelinkCorePlugin::_activeVehicleChanged);
+}
+
+QVariantList& HerelinkCorePlugin::toolBarIndicators()
+{
+    if (_toolBarIndicatorList.isEmpty()) {
+        _toolBarIndicatorList = QVariantList({
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/GPSRTKIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkControllerSignalIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkAirSignalIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkFlyDistanceIndicator.qml")),
+        });
+    }
+    return _toolBarIndicatorList;
 }
 
 QVariantList& HerelinkCorePlugin::settingsPages()

@@ -190,6 +190,40 @@ public class QGCActivity extends QtActivity
 
     public native void nativeInit();
 
+    // Herelink telemetry update from notification listener broadcast
+    public static native void nativeHerelinkTelemetryUpdate(
+        String pairState,
+        int controllerSignalMain, int controllerSignalSecondary,
+        int airSignalMain, int airSignalSecondary,
+        int uplinkRate, int uplinkBandwidth, int flyDistance);
+
+    private static final String HERELINK_TELEMETRY_ACTION = "org.mavlink.qgroundcontrol.HERELINK_TELEMETRY";
+
+    private final BroadcastReceiver _herelinkTelemetryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!HERELINK_TELEMETRY_ACTION.equals(intent.getAction())) {
+                return;
+            }
+            try {
+                String pairState = intent.getStringExtra("pair_state");
+                if (pairState == null) {
+                    pairState = "Unknown";
+                }
+                int ctrlMain = intent.getIntExtra("ctrl_signal_main", 0);
+                int ctrlSec  = intent.getIntExtra("ctrl_signal_sec", 0);
+                int airMain  = intent.getIntExtra("air_signal_main", 0);
+                int airSec   = intent.getIntExtra("air_signal_sec", 0);
+                int ulRate   = intent.getIntExtra("uplink_rate", 0);
+                int ulBw     = intent.getIntExtra("uplink_bw", 0);
+                int dist     = intent.getIntExtra("fly_distance", 0);
+                nativeHerelinkTelemetryUpdate(pairState, ctrlMain, ctrlSec, airMain, airSec, ulRate, ulBw, dist);
+            } catch (Exception e) {
+                Log.e(TAG, "Herelink telemetry receive exception: " + e);
+            }
+        }
+    };
+
     // QGCActivity singleton
     public QGCActivity()
     {
@@ -223,6 +257,14 @@ public class QGCActivity extends QtActivity
         filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         _instance.registerReceiver(_instance._usbReceiver, filter);
+
+        // Register receiver for Herelink telemetry broadcasts from HerelinkNotificationService
+        IntentFilter herelinkFilter = new IntentFilter(HERELINK_TELEMETRY_ACTION);
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            _instance.registerReceiver(_herelinkTelemetryReceiver, herelinkFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            _instance.registerReceiver(_herelinkTelemetryReceiver, herelinkFilter);
+        }
 
         // Create intent for usb permission request
         int intentFlags = 0;
@@ -279,6 +321,11 @@ public class QGCActivity extends QtActivity
             probeAccessoriesTimer.cancel();
         }
         unregisterReceiver(mOpenAccessoryReceiver);
+        try {
+            unregisterReceiver(_herelinkTelemetryReceiver);
+        } catch (Exception e) {
+            Log.w(TAG, "Herelink telemetry receiver unregister exception: " + e);
+        }
         try {
             if (_wifiMulticastLock != null) {
                 _wifiMulticastLock.release();
