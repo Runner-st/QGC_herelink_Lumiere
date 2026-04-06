@@ -205,25 +205,19 @@ void HerelinkCorePlugin::_activeVehicleChanged(Vehicle* activeVehicle)
     }
 }
 
-// Same as original, only we set font size to medium by default for Herelink
 void HerelinkCorePlugin::factValueGridCreateDefaultSettings(const QString& defaultSettingsGroup)
 {
     HorizontalFactValueGrid factValueGrid(defaultSettingsGroup);
-
-    bool        includeFWValues = factValueGrid.vehicleClass() == QGCMAVLink::VehicleClassFixedWing || factValueGrid.vehicleClass() == QGCMAVLink::VehicleClassVTOL || factValueGrid.vehicleClass() == QGCMAVLink::VehicleClassAirship;
 
     factValueGrid.setFontSize(FactValueGrid::MediumFontSize);
 
     factValueGrid.appendColumn();
     factValueGrid.appendColumn();
     factValueGrid.appendColumn();
-    if (includeFWValues) {
-        factValueGrid.appendColumn();
-    }
     factValueGrid.appendRow();
 
-    int                 rowIndex    = 0;
-    QmlObjectListModel* column      = factValueGrid.columns()->value<QmlObjectListModel*>(0);
+    int                 rowIndex = 0;
+    QmlObjectListModel* column   = factValueGrid.columns()->value<QmlObjectListModel*>(0);
 
     InstrumentValueData* value = column->value<InstrumentValueData*>(rowIndex++);
     value->setFact("Vehicle", "AltitudeRelative");
@@ -232,13 +226,12 @@ void HerelinkCorePlugin::factValueGridCreateDefaultSettings(const QString& defau
     value->setShowUnits(true);
 
     value = column->value<InstrumentValueData*>(rowIndex++);
-    value->setFact("Vehicle", "DistanceToHome");
-    value->setIcon("bookmark copy 3.svg");
-    value->setText(value->fact()->shortDescription());
+    value->setFact("battery0", "current");
+    value->setText("Струм");
     value->setShowUnits(true);
 
-    rowIndex    = 0;
-    column      = factValueGrid.columns()->value<QmlObjectListModel*>(1);
+    rowIndex = 0;
+    column   = factValueGrid.columns()->value<QmlObjectListModel*>(1);
 
     value = column->value<InstrumentValueData*>(rowIndex++);
     value->setFact("Vehicle", "ClimbRate");
@@ -252,24 +245,8 @@ void HerelinkCorePlugin::factValueGridCreateDefaultSettings(const QString& defau
     value->setText(value->fact()->shortDescription());
     value->setShowUnits(true);
 
-
-    if (includeFWValues) {
-        rowIndex    = 0;
-        column      = factValueGrid.columns()->value<QmlObjectListModel*>(2);
-
-        value = column->value<InstrumentValueData*>(rowIndex++);
-        value->setFact("Vehicle", "AirSpeed");
-        value->setText("AirSpd");
-        value->setShowUnits(true);
-
-        value = column->value<InstrumentValueData*>(rowIndex++);
-        value->setFact("Vehicle", "ThrottlePct");
-        value->setText("Thr");
-        value->setShowUnits(true);
-    }
-
-    rowIndex    = 0;
-    column      = factValueGrid.columns()->value<QmlObjectListModel*>(includeFWValues ? 3 : 2);
+    rowIndex = 0;
+    column   = factValueGrid.columns()->value<QmlObjectListModel*>(2);
 
     value = column->value<InstrumentValueData*>(rowIndex++);
     value->setFact("Vehicle", "FlightTime");
@@ -278,8 +255,7 @@ void HerelinkCorePlugin::factValueGridCreateDefaultSettings(const QString& defau
     value->setShowUnits(false);
 
     value = column->value<InstrumentValueData*>(rowIndex++);
-    value->setFact("Vehicle", "FlightDistance");
-    value->setIcon("travel-walk.svg");
-    value->setText(value->fact()->shortDescription());
+    value->setFact("Vehicle", "ThrottlePct");
+    value->setText("Газ");
     value->setShowUnits(true);
 }
