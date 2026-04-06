@@ -19,6 +19,10 @@ HerelinkTelemetry::HerelinkTelemetry(QObject *parent)
     : QObject(parent)
 {
     _instance = this;
+
+    _staleTimer.setSingleShot(true);
+    _staleTimer.setInterval(5000);
+    connect(&_staleTimer, &QTimer::timeout, this, &HerelinkTelemetry::_staleTimeout);
 }
 
 HerelinkTelemetry::~HerelinkTelemetry()
@@ -58,6 +62,16 @@ void HerelinkTelemetry::updateTelemetry(
     emit telemetryChanged();
 
     if (!wasAvailable) {
+        emit availableChanged();
+    }
+
+    _staleTimer.start();
+}
+
+void HerelinkTelemetry::_staleTimeout()
+{
+    if (_available) {
+        _available = false;
         emit availableChanged();
     }
 }

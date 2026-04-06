@@ -1,5 +1,6 @@
 package org.mavlink.qgroundcontrol;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
@@ -94,6 +95,12 @@ public class HerelinkNotificationService extends NotificationListenerService {
 
         String text = bigText.toString();
         broadcastTelemetry(text);
+    }
+
+    @Override
+    public void onListenerDisconnected() {
+        Log.w(TAG, "NotificationListener disconnected, requesting rebind");
+        requestRebind(new ComponentName(this, HerelinkNotificationService.class));
     }
 
     @Override

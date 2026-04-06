@@ -11,6 +11,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QTimer>
 
 /// Provides access to Herelink radio telemetry from HerelinkSettings notification.
 /// On Android, receives data from HerelinkNotificationService (running in separate process)
@@ -60,9 +61,13 @@ signals:
     void availableChanged();
     void telemetryChanged();
 
+private slots:
+    void _staleTimeout();
+
 private:
     static HerelinkTelemetry* _instance;
 
+    QTimer  _staleTimer;
     bool    _available                 = false;
     QString _pairState                 = "Unknown";
     int     _controllerSignalMain      = 0;
