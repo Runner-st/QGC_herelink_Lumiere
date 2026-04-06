@@ -89,6 +89,9 @@ ApplicationWindow {
 
         // Property to manage RemoteID quick acces to settings page
         property bool               commingFromRIDIndicator:        false
+
+        // Property to trigger auto-scroll to Video Settings in GeneralSettings
+        property bool               scrollToVideoSettings:          false
     }
 
     /// Default color palette used throughout the UI

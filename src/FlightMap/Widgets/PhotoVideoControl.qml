@@ -51,6 +51,8 @@ Rectangle {
     property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
     property bool   _videoStreamInPhotoMode:                    false
     property string _currentHdmiLabel:                          _videoStreamSettings && _videoStreamSettings.cameraId.rawValue === 0 ? qsTr("HDMI1") : qsTr("HDMI2")
+    property string _activeVideoSource:                         _videoStreamSettings ? _videoStreamSettings.videoSource.rawValue : ""
+    property bool   _isHerelinkAirUnitSource:                   _activeVideoSource === "Herelink AirUnit"
 
     // The following properties relate to a mavlink protocol camera
     property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
@@ -187,7 +189,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top:            parent.top
         anchors.topMargin:      _margins
-        visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable
+        visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable && _isHerelinkAirUnitSource
         text:                   _currentHdmiLabel
         enabled:                !QGroundControl.videoManager.videoStreamControl.settingInProgress
         onClicked:              toggleHerelinkHdmiSource()

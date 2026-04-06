@@ -64,7 +64,25 @@ Rectangle {
 
     readonly property real _internalWidthRatio: 0.8
 
+    Component.onCompleted: {
+        if (globals.scrollToVideoSettings) {
+            globals.scrollToVideoSettings = false
+            scrollToVideoTimer.start()
+        }
+    }
+
+    Timer {
+        id:       scrollToVideoTimer
+        interval: 200
+        repeat:   false
+        onTriggered: {
+            var pos = videoGrid.mapToItem(outerItem, 0, 0)
+            settingsFlickable.contentY = Math.max(0, Math.min(pos.y, settingsFlickable.contentHeight - settingsFlickable.height))
+        }
+    }
+
         QGCFlickable {
+            id:                 settingsFlickable
             clip:               true
             anchors.fill:       parent
             contentHeight:      outerItem.height
