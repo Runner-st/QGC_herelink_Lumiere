@@ -10,11 +10,12 @@
 import QtQuick          2.11
 import QtQuick.Layouts  1.11
 
-import QGroundControl               1.0
-import QGroundControl.Controls      1.0
-import QGroundControl.ScreenTools   1.0
-import QGroundControl.Palette       1.0
-import QGroundControl.Herelink      1.0
+import QGroundControl                       1.0
+import QGroundControl.Controls              1.0
+import QGroundControl.MultiVehicleManager   1.0
+import QGroundControl.ScreenTools           1.0
+import QGroundControl.Palette               1.0
+import QGroundControl.Herelink              1.0
 
 //-------------------------------------------------------------------------
 //-- Herelink Fly Distance Indicator
@@ -24,7 +25,8 @@ Item {
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
 
-    property bool showIndicator: HerelinkTelemetry.available
+    property var  _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
+    property bool showIndicator:  HerelinkTelemetry.available && _activeVehicle
 
     function formatDistance(m) {
         if (m >= 1000) {

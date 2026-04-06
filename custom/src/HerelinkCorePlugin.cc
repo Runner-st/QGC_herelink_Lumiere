@@ -56,10 +56,11 @@ QVariantList& HerelinkCorePlugin::toolBarIndicators()
 {
     if (_toolBarIndicatorList.isEmpty()) {
         _toolBarIndicatorList = QVariantList({
-            QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/GPSRTKIndicator.qml")),
-            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkControllerSignalIndicator.qml")),
-            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkAirSignalIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/BatteryIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/MessageIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkSignalIndicator.qml")),
             QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkFlyDistanceIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/GPSRTKIndicator.qml")),
         });
     }
     return _toolBarIndicatorList;
