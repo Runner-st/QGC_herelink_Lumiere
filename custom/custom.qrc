@@ -8,6 +8,7 @@
     <qresource prefix="/qml">
     </qresource>
     <qresource prefix="/custom/qml">
+        <file alias="HerelinkNotificationAccessIndicator.qml">qml/HerelinkNotificationAccessIndicator.qml</file>
         <file alias="HerelinkSignalIndicator.qml">qml/HerelinkSignalIndicator.qml</file>
         <file alias="HerelinkFlyDistanceIndicator.qml">qml/HerelinkFlyDistanceIndicator.qml</file>
     </qresource>

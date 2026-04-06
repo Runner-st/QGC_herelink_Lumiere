@@ -56,6 +56,7 @@ import android.os.PowerManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.app.PendingIntent;
+import android.provider.Settings;
 import android.view.WindowManager;
 import android.os.Bundle;
 import android.bluetooth.BluetoothDevice;
@@ -815,6 +816,21 @@ public class QGCActivity extends QtActivity
                 }
             }
         }).start();
+    }
+
+    public static boolean isNotificationListenerEnabled() {
+        if (_instance == null) return false;
+        String flat = Settings.Secure.getString(
+            _instance.getContentResolver(), "enabled_notification_listeners");
+        if (flat == null) return false;
+        return flat.contains(_instance.getPackageName());
+    }
+
+    public static void openNotificationListenerSettings() {
+        if (_instance == null) return;
+        Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        _instance.startActivity(intent);
     }
 
     public static String getSDCardPath() {

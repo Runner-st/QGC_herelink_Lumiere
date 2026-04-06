@@ -11,6 +11,8 @@
 
 #if defined(__android__)
 #include <jni.h>
+#include <QtAndroid>
+#include <QAndroidJniObject>
 #endif
 
 HerelinkTelemetry* HerelinkTelemetry::_instance = nullptr;
@@ -23,6 +25,11 @@ HerelinkTelemetry::HerelinkTelemetry(QObject *parent)
     _staleTimer.setSingleShot(true);
     _staleTimer.setInterval(5000);
     connect(&_staleTimer, &QTimer::timeout, this, &HerelinkTelemetry::_staleTimeout);
+
+    _accessCheckTimer.setInterval(2000);
+    connect(&_accessCheckTimer, &QTimer::timeout, this, &HerelinkTelemetry::checkNotificationAccess);
+    _accessCheckTimer.start();
+    checkNotificationAccess();
 }
 
 HerelinkTelemetry::~HerelinkTelemetry()
@@ -35,6 +42,36 @@ HerelinkTelemetry::~HerelinkTelemetry()
 HerelinkTelemetry* HerelinkTelemetry::instance()
 {
     return _instance;
+}
+
+void HerelinkTelemetry::checkNotificationAccess()
+{
+    bool granted = false;
+#if defined(__android__)
+    granted = QAndroidJniObject::callStaticMethod<jboolean>(
+        "org/mavlink/qgroundcontrol/QGCActivity",
+        "isNotificationListenerEnabled",
+        "()Z");
+#else
+    granted = true;
+#endif
+    if (granted != _notificationAccessGranted) {
+        _notificationAccessGranted = granted;
+        emit notificationAccessChanged();
+    }
+    if (_notificationAccessGranted && _available) {
+        _accessCheckTimer.stop();
+    }
+}
+
+void HerelinkTelemetry::openNotificationSettings()
+{
+#if defined(__android__)
+    QAndroidJniObject::callStaticMethod<void>(
+        "org/mavlink/qgroundcontrol/QGCActivity",
+        "openNotificationListenerSettings",
+        "()V");
+#endif
 }
 
 void HerelinkTelemetry::updateTelemetry(
@@ -65,6 +102,10 @@ void HerelinkTelemetry::updateTelemetry(
         emit availableChanged();
     }
 
+    if (_notificationAccessGranted && _available) {
+        _accessCheckTimer.stop();
+    }
+
     _staleTimer.start();
 }
 
@@ -73,6 +114,9 @@ void HerelinkTelemetry::_staleTimeout()
     if (_available) {
         _available = false;
         emit availableChanged();
+        if (!_accessCheckTimer.isActive()) {
+            _accessCheckTimer.start();
+        }
     }
 }
 

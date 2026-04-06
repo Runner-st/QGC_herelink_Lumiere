@@ -58,6 +58,7 @@ QVariantList& HerelinkCorePlugin::toolBarIndicators()
         _toolBarIndicatorList = QVariantList({
             QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/BatteryIndicator.qml")),
             QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/MessageIndicator.qml")),
+            QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkNotificationAccessIndicator.qml")),
             QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkSignalIndicator.qml")),
             QVariant::fromValue(QUrl::fromUserInput("qrc:/custom/qml/HerelinkFlyDistanceIndicator.qml")),
             QVariant::fromValue(QUrl::fromUserInput("qrc:/toolbar/GPSRTKIndicator.qml")),

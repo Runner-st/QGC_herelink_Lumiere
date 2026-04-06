@@ -29,6 +29,7 @@ class HerelinkTelemetry : public QObject
     Q_PROPERTY(int     uplinkRate               READ uplinkRate               NOTIFY telemetryChanged)
     Q_PROPERTY(int     uplinkBandwidth          READ uplinkBandwidth          NOTIFY telemetryChanged)
     Q_PROPERTY(int     flyDistance              READ flyDistance              NOTIFY telemetryChanged)
+    Q_PROPERTY(bool    notificationAccessGranted READ notificationAccessGranted NOTIFY notificationAccessChanged)
 
 public:
     explicit HerelinkTelemetry(QObject *parent = nullptr);
@@ -37,6 +38,7 @@ public:
     static HerelinkTelemetry* instance();
 
     bool    available()                const { return _available; }
+    bool    notificationAccessGranted() const { return _notificationAccessGranted; }
     QString pairState()                const { return _pairState; }
     int     controllerSignalMain()     const { return _controllerSignalMain; }
     int     controllerSignalSecondary() const { return _controllerSignalSecondary; }
@@ -45,6 +47,9 @@ public:
     int     uplinkRate()               const { return _uplinkRate; }
     int     uplinkBandwidth()          const { return _uplinkBandwidth; }
     int     flyDistance()              const { return _flyDistance; }
+
+    Q_INVOKABLE void openNotificationSettings();
+    Q_INVOKABLE void checkNotificationAccess();
 
     Q_INVOKABLE void updateTelemetry(
         const QString& pairState,
@@ -60,6 +65,7 @@ public:
 signals:
     void availableChanged();
     void telemetryChanged();
+    void notificationAccessChanged();
 
 private slots:
     void _staleTimeout();
@@ -68,6 +74,8 @@ private:
     static HerelinkTelemetry* _instance;
 
     QTimer  _staleTimer;
+    QTimer  _accessCheckTimer;
+    bool    _notificationAccessGranted = false;
     bool    _available                 = false;
     QString _pairState                 = "Unknown";
     int     _controllerSignalMain      = 0;
