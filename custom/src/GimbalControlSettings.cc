@@ -68,7 +68,26 @@ void GimbalControlSettings::_load()
 {
     QSettings settings;
     settings.beginGroup(kSettingsGroup);
+    const bool hasKey = settings.contains(kPitchButtonsKey);
     const QByteArray buttonBytes = settings.value(kPitchButtonsKey).toByteArray();
+    settings.endGroup();
+
+    if (!hasKey) {
+        // Fresh install — populate defaults and persist them
+        _pitchButtons = {
+            { QStringLiteral("+10"), 10.0 },
+            { QStringLiteral("-1"),  -1.0 },
+            { QStringLiteral("-2"),  -2.0 },
+            { QStringLiteral("-3"),  -3.0 },
+            { QStringLiteral("-4"),  -4.0 },
+            { QStringLiteral("-5"),  -5.0 },
+            { QStringLiteral("-6"),  -6.0 },
+            { QStringLiteral("-7"),  -7.0 },
+            { QStringLiteral("-8"),  -8.0 },
+        };
+        _save();
+        return;
+    }
 
     if (!buttonBytes.isEmpty()) {
         const QJsonDocument document = QJsonDocument::fromJson(buttonBytes);
@@ -85,8 +104,6 @@ void GimbalControlSettings::_load()
             }
         }
     }
-
-    settings.endGroup();
 }
 
 void GimbalControlSettings::_save() const

@@ -60,7 +60,7 @@ Item {
                     }
 
                     QGCLabel {
-                        text: qsTr("Range: %1° to %2°").arg(-25).arg(10)
+                        text: qsTr("Range: %1° to %2°").arg(-25).arg(15)
                         font.pointSize: ScreenTools.smallFontPointSize
                         color: qgcPal.colorGrey
                     }
@@ -78,7 +78,7 @@ Item {
                             primary: true
                             onClicked: {
                                 const pitch = parseFloat(pitchField.text)
-                                if (isNaN(pitch) || pitch < -25 || pitch > 10) {
+                                if (isNaN(pitch) || pitch < -25 || pitch > 15) {
                                     // TODO: Show error dialog
                                     return
                                 }

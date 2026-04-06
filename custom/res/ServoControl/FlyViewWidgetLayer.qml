@@ -302,6 +302,14 @@ Item {
         visible:                    _activeVehicle && _gimbalController && _gimbalController.pitchButtons.length > 0
         property real padding:      ScreenTools.defaultFontPixelHeight * 0.5
 
+        property var  _gimbalActiveGimbal: _activeVehicle ? _activeVehicle.gimbalController.activeGimbal : null
+        property real _currentGimbalPitch: _gimbalActiveGimbal ? _gimbalActiveGimbal.absolutePitch.rawValue : NaN
+        readonly property real _pitchTolerance: 0.5
+
+        function isNearPitch(target) {
+            return !isNaN(_currentGimbalPitch) && Math.abs(_currentGimbalPitch - target) <= _pitchTolerance
+        }
+
         width:                      gimbalControlRow.implicitWidth + (padding * 2)
         height:                     gimbalControlRow.implicitHeight + (padding * 2)
         z:                          QGroundControl.zOrderWidgets
@@ -322,7 +330,7 @@ Item {
             QGCButton {
                 text: "0"
                 height: ScreenTools.defaultFontPixelHeight * 1.5
-                primary: true
+                primary: gimbalControlBar.isNearPitch(0.0)
                 onClicked: _gimbalController.resetGimbalToLevel()
             }
 
@@ -331,6 +339,7 @@ Item {
                 QGCButton {
                     text: modelData.label
                     height: ScreenTools.defaultFontPixelHeight * 1.5
+                    primary: gimbalControlBar.isNearPitch(modelData.pitchOffset)
                     onClicked: _gimbalController.triggerPitchButton(index)
                 }
             }
