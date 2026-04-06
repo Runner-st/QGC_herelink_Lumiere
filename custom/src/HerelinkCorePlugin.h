@@ -38,11 +38,14 @@ public:
     // Overrides from QGCTool
     void setToolbox(QGCToolbox* toolbox) override;
 
+    QVariantList& toolBarIndicators() override;
+
 private slots:
     void _activeVehicleChanged(Vehicle* activeVehicle);
 
 private:
     QVariantList              _settingsList;
+    QVariantList              _toolBarIndicatorList;
     QmlComponentInfo*         _settingsGeneral        = nullptr;
     QmlComponentInfo*         _settingsCommLinks      = nullptr;
     QmlComponentInfo*         _settingsOfflineMaps    = nullptr;

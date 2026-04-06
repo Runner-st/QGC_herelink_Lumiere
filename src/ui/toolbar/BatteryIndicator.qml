@@ -77,14 +77,14 @@ Item {
             }
 
             function getBatteryPercentageText() {
-                if (!isNaN(battery.percentRemaining.rawValue)) {
+                if (!isNaN(battery.voltage.rawValue)) {
+                    return battery.voltage.valueString + battery.voltage.units
+                } else if (!isNaN(battery.percentRemaining.rawValue)) {
                     if (battery.percentRemaining.rawValue > 98.9) {
                         return qsTr("100%")
                     } else {
                         return battery.percentRemaining.valueString + battery.percentRemaining.units
                     }
-                } else if (!isNaN(battery.voltage.rawValue)) {
-                    return battery.voltage.valueString + battery.voltage.units
                 } else if (battery.chargeState.rawValue !== MAVLink.MAV_BATTERY_CHARGE_STATE_UNDEFINED) {
                     return battery.chargeState.enumStringValue
                 }

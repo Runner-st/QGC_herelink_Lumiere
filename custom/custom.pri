@@ -20,7 +20,7 @@ win32 {
 } else {
     CUSTOM_QGC_VER_BUILD = $$system("echo $(($$CUSTOM_QGC_VER_BUILD - $$CUSTOM_QGC_VER_FIRST_BUILD))")
 }
-CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1104
+CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1105
 
 DEFINES -= APP_VERSION_STR=\"\\\"$$APP_VERSION_STR\\\"\"
 DEFINES += APP_VERSION_STR=\"\\\"$$CUSTOM_QGC_VERSION\\\"\"
@@ -59,9 +59,8 @@ DEFINES += \
 CONFIG += AndroidHomeApp
 
 # Our own, custom resources
-# Not yet used
-#RESOURCES += \
-#    $$PWD/custom.qrc
+RESOURCES += \
+    $$PWD/custom.qrc
 
 QML_IMPORT_PATH += \
    $$PWD/src
@@ -74,6 +73,7 @@ SOURCES += \
     $$PWD/src/ServoControlSettings.cc \
     $$PWD/src/GimbalControlController.cc \
     $$PWD/src/GimbalControlSettings.cc \
+    $$PWD/src/Herelink/HerelinkTelemetry.cc \
 
 HEADERS += \
     $$PWD/src/HerelinkCorePlugin.h \
@@ -82,9 +82,11 @@ HEADERS += \
     $$PWD/src/ServoControlSettings.h \
     $$PWD/src/GimbalControlController.h \
     $$PWD/src/GimbalControlSettings.h \
+    $$PWD/src/Herelink/HerelinkTelemetry.h \
 
 INCLUDEPATH += \
     $$PWD/src \
+    $$PWD/src/Herelink \
 
 # Herelink specific custom sources, for HDMI switching
 message("Including custom Herelink sources for source switching")
