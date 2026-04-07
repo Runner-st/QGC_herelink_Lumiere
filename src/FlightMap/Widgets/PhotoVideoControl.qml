@@ -24,13 +24,14 @@ import QGroundControl.FactSystem        1.0
 import QGroundControl.FactControls      1.0
 
 Rectangle {
-    // height:     settingsButton.height + hdmiToggleButton.height + mainLayout.height + (_margins * 5)
-    height:     hdmiToggleButton.height + mainLayout.height + (_margins * 5)
+    height:     (hdmiToggleButton.visible ? hdmiToggleButton.implicitHeight + _margins : 0) + mainLayout.implicitHeight + _margins * 2
     color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
     radius:     _margins
     visible:    (_mavlinkCamera || _videoStreamAvailable || _simpleCameraAvailable) && multiVehiclePanelSelector.showSingleVehiclePanel
 
-    property real   _margins:                                   ScreenTools.defaultFontPixelHeight / 2
+    Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.InOutQuad } }
+
+    property real   _margins:                                   ScreenTools.defaultFontPixelHeight * 0.35
     property var    _activeVehicle:                             QGroundControl.multiVehicleManager.activeVehicle
 
     // The following properties relate to a simple camera
@@ -185,8 +186,10 @@ Rectangle {
 
     QGCButton {
         id:                     hdmiToggleButton
-        anchors.margins:        _margins
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left:           parent.left
+        anchors.right:          parent.right
+        anchors.leftMargin:     _margins
+        anchors.rightMargin:    _margins
         anchors.top:            parent.top
         anchors.topMargin:      _margins
         visible:                QGroundControl.corePlugin.isHerelink && _videoStreamAvailable && _isHerelinkAirUnitSource
@@ -197,9 +200,8 @@ Rectangle {
 
     ColumnLayout {
         id:                         mainLayout
-        anchors.margins:            _margins
-        anchors.top:                hdmiToggleButton.bottom
-        anchors.topMargin:          _margins + 30
+        anchors.top:                hdmiToggleButton.visible ? hdmiToggleButton.bottom : parent.top
+        anchors.topMargin:          _margins
         anchors.horizontalCenter:   parent.horizontalCenter
         spacing:                    ScreenTools.defaultFontPixelHeight / 2
 
