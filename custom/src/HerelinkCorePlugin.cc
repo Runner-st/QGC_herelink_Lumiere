@@ -79,11 +79,13 @@ QVariantList& HerelinkCorePlugin::settingsPages()
     _settingsCommLinks = new QmlComponentInfo(tr("Comm Links"), QUrl::fromUserInput("qrc:/qml/LinkSettings.qml"), QUrl::fromUserInput("qrc:/res/waves.svg"), this);
     _settingsList.append(QVariant::fromValue(_settingsCommLinks));
 
-    _settingsServoControl = new QmlComponentInfo(tr("Servo Control"), QUrl::fromUserInput("qrc:/qml/ServoControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
-    _settingsList.append(QVariant::fromValue(_settingsServoControl));
+    // Simplified app: Servo Control settings page hidden
+    // _settingsServoControl = new QmlComponentInfo(tr("Servo Control"), QUrl::fromUserInput("qrc:/qml/ServoControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
+    // _settingsList.append(QVariant::fromValue(_settingsServoControl));
 
-    _settingsGimbalControl = new QmlComponentInfo(tr("Gimbal Control"), QUrl::fromUserInput("qrc:/qml/GimbalControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
-    _settingsList.append(QVariant::fromValue(_settingsGimbalControl));
+    // Simplified app: Gimbal Control settings page hidden
+    // _settingsGimbalControl = new QmlComponentInfo(tr("Gimbal Control"), QUrl::fromUserInput("qrc:/qml/GimbalControlSettings.qml"), QUrl::fromUserInput("qrc:/res/action.svg"), this);
+    // _settingsList.append(QVariant::fromValue(_settingsGimbalControl));
 
     _settingsOfflineMaps = new QmlComponentInfo(tr("Offline Maps"), QUrl::fromUserInput("qrc:/qml/OfflineMap.qml"), QUrl::fromUserInput("qrc:/res/waves.svg"), this);
     _settingsList.append(QVariant::fromValue(_settingsOfflineMaps));
