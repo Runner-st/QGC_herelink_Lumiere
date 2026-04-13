@@ -391,7 +391,6 @@ double VideoManager::aspectRatio()
     if(_activeVehicle && _activeVehicle->cameraManager()) {
         QGCVideoStreamInfo* pInfo = _activeVehicle->cameraManager()->currentStreamInstance();
         if(pInfo) {
-            qCDebug(VideoManagerLog) << "Primary AR: " << pInfo->aspectRatio();
             return pInfo->aspectRatio();
         }
     }
@@ -405,7 +404,6 @@ double VideoManager::thermalAspectRatio()
     if(_activeVehicle && _activeVehicle->cameraManager()) {
         QGCVideoStreamInfo* pInfo = _activeVehicle->cameraManager()->thermalStreamInstance();
         if(pInfo) {
-            qCDebug(VideoManagerLog) << "Thermal AR: " << pInfo->aspectRatio();
             return pInfo->aspectRatio();
         }
     }
@@ -583,9 +581,7 @@ bool
 VideoManager::isUvc()
 {
 #ifndef QGC_DISABLE_UVC
-    auto isUvc = hasVideo() && !_uvcVideoSourceID.isEmpty();
-    qCDebug(VideoManagerLog) << "Is Video source UVC: " << (isUvc ? "yes" : "no");
-    return isUvc;
+    return hasVideo() && !_uvcVideoSourceID.isEmpty();
 #else
     return false;
 #endif
@@ -814,22 +810,14 @@ VideoManager::_restartVideo(unsigned id)
     bool newLowLatencyStreaming = _lowLatencyStreaming[id];
     QString newUri = _videoUri[id];
     qCDebug(VideoManagerLog) << "New Video URI " << newUri;
-    qDebug() << "_restartVideo " << id;
-    qDebug() << "_videoStarted[id] " << _videoStarted[id];
-    qDebug() << "Old Video URI " << oldUri;
-    qDebug() << "New Video URI " << newUri;
-    qDebug() << "oldLowLatencyStreaming " << oldLowLatencyStreaming;
-    qDebug() << "newLowLatencyStreaming " << newLowLatencyStreaming;
 
     // FIXME: AV: use _updateSettings() result to check if settings were changed
     if (_videoStarted[id] && oldUri == newUri && oldLowLatencyStreaming == newLowLatencyStreaming) {
         qCDebug(VideoManagerLog) << "No sense to restart video streaming, skipped"  << id;
-        qDebug() << "No sense to restart video streaming, skipped"  << id;
         return;
     }
 
     qCDebug(VideoManagerLog) << "Restart video streaming"  << id;
-    qDebug() << "Restart video streaming"  << id;
 
     if (_videoStarted[id]) {
         _stopReceiver(id);
