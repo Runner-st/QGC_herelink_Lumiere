@@ -14,14 +14,15 @@ import QtQuick.Controls         1.4
 import QtQuick.Dialogs          1.2
 import QtGraphicalEffects       1.0
 
-import QGroundControl                   1.0
-import QGroundControl.ScreenTools       1.0
-import QGroundControl.Controls          1.0
-import QGroundControl.Palette           1.0
-import QGroundControl.Vehicle           1.0
-import QGroundControl.Controllers       1.0
-import QGroundControl.FactSystem        1.0
-import QGroundControl.FactControls      1.0
+import QGroundControl                           1.0
+import QGroundControl.ScreenTools               1.0
+import QGroundControl.Controls                  1.0
+import QGroundControl.Palette                   1.0
+import QGroundControl.Vehicle                   1.0
+import QGroundControl.Controllers               1.0
+import QGroundControl.FactSystem                1.0
+import QGroundControl.FactControls              1.0
+import QGroundControl.AndroidScreenRecorder     1.0
 
 Rectangle {
     height:     (hdmiToggleButton.visible ? hdmiToggleButton.implicitHeight + _margins : 0) + mainLayout.implicitHeight + _margins * 2
@@ -140,8 +141,10 @@ Rectangle {
             } else {
                 if (_videoStreamManager.recording) {
                     _videoStreamManager.stopRecording()
+                    AndroidScreenRecorder.stopRecording()
                 } else {
                     _videoStreamManager.startRecording()
+                    AndroidScreenRecorder.startRecording()
                 }
             }
         }

@@ -1,5 +1,6 @@
 #include "HerelinkCorePlugin.h"
 #include "HerelinkTelemetry.h"
+#include "AndroidScreenRecorder.h"
 
 #include "AutoConnectSettings.h"
 #include "VideoSettings.h"
@@ -40,6 +41,17 @@ void HerelinkCorePlugin::setToolbox(QGCToolbox* toolbox)
         "QGroundControl.Herelink", 1, 0, "HerelinkTelemetry",
         [](QQmlEngine*, QJSEngine*) -> QObject* {
             QObject* inst = HerelinkTelemetry::instance();
+            QQmlEngine::setObjectOwnership(inst, QQmlEngine::CppOwnership);
+            return inst;
+        });
+
+    // Android screen recorder singleton (no-op on non-Android builds)
+    (void)new AndroidScreenRecorder(this);
+
+    qmlRegisterSingletonType<AndroidScreenRecorder>(
+        "QGroundControl.AndroidScreenRecorder", 1, 0, "AndroidScreenRecorder",
+        [](QQmlEngine*, QJSEngine*) -> QObject* {
+            QObject* inst = AndroidScreenRecorder::instance();
             QQmlEngine::setObjectOwnership(inst, QQmlEngine::CppOwnership);
             return inst;
         });

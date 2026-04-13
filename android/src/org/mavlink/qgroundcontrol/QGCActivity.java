@@ -50,6 +50,8 @@ import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
 import android.widget.Toast;
 import android.util.Log;
 import android.os.PowerManager;
@@ -82,7 +84,11 @@ public class QGCActivity extends QtActivity
     private TaiSync                                     taiSync = null;
     private Timer                                       probeAccessoriesTimer = null;
     private static WifiManager.MulticastLock            _wifiMulticastLock;
-    
+    private static MediaProjectionManager               _mediaProjectionManager;
+    private static final int                            SCREEN_RECORD_REQUEST_CODE = 1001;
+    private static String                               _pendingScreenRecordPath = null;
+    private static MediaProjection                      _pendingMediaProjection = null;
+
     public static Context m_context;
 
     private final static ExecutorService m_Executor = Executors.newSingleThreadExecutor();
@@ -191,6 +197,9 @@ public class QGCActivity extends QtActivity
 
     public native void nativeInit();
 
+    // Screen recording status callback to C++
+    public static native void nativeScreenRecordingStatusChanged(boolean recording);
+
     // Herelink telemetry update from notification listener broadcast
     public static native void nativeHerelinkTelemetryUpdate(
         String pairState,
@@ -249,6 +258,7 @@ public class QGCActivity extends QtActivity
         _instance.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         _usbManager = (UsbManager)_instance.getSystemService(Context.USB_SERVICE);
+        _mediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
 
         // Register for USB Detach and USB Permission intent
         IntentFilter filter = new IntentFilter();
@@ -831,6 +841,68 @@ public class QGCActivity extends QtActivity
         Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         _instance.startActivity(intent);
+    }
+
+    // Called from C++ (AndroidScreenRecorder) to request screen recording permission and start
+    public static void startScreenRecording(String outputPath) {
+        if (_instance == null || _mediaProjectionManager == null) {
+            Log.e(TAG, "startScreenRecording: instance or manager not ready");
+            return;
+        }
+        _pendingScreenRecordPath = outputPath;
+        Intent captureIntent = _mediaProjectionManager.createScreenCaptureIntent();
+        _instance.startActivityForResult(captureIntent, SCREEN_RECORD_REQUEST_CODE);
+    }
+
+    // Called from C++ (AndroidScreenRecorder) to stop screen recording
+    public static void stopScreenRecording() {
+        if (_instance == null) return;
+        Intent stopIntent = new Intent(_instance, ScreenRecorderService.class);
+        stopIntent.setAction(ScreenRecorderService.ACTION_STOP);
+        _instance.startService(stopIntent);
+        // nativeScreenRecordingStatusChanged(false) is called by ScreenRecorderService.stopRecording()
+    }
+
+    // Called from ScreenRecorderService after recording successfully starts or fails
+    public static void reportScreenRecordingStarted(boolean success, String error) {
+        if (success) {
+            qgcLogDebug("ScreenRecorderService: recording started successfully");
+            nativeScreenRecordingStatusChanged(true);
+        } else {
+            qgcLogWarning("ScreenRecorderService: failed to start - " + (error != null ? error : "unknown error"));
+            nativeScreenRecordingStatusChanged(false);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SCREEN_RECORD_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && _pendingScreenRecordPath != null) {
+                // Obtain MediaProjection HERE in the Activity context — must not be deferred.
+                // Pass it to the service via a static field (same process) to avoid Parcelable issues.
+                _pendingMediaProjection = _mediaProjectionManager.getMediaProjection(resultCode, data);
+                Intent serviceIntent = new Intent(this, ScreenRecorderService.class);
+                serviceIntent.putExtra("outputPath", _pendingScreenRecordPath);
+                if (android.os.Build.VERSION.SDK_INT >= 26) {
+                    startForegroundService(serviceIntent);
+                } else {
+                    startService(serviceIntent);
+                }
+                // Do NOT call nativeScreenRecordingStatusChanged(true) here —
+                // the service will call reportScreenRecordingStarted() once it confirms start.
+            } else {
+                Log.w(TAG, "Screen recording permission denied or cancelled");
+                nativeScreenRecordingStatusChanged(false);
+            }
+            _pendingScreenRecordPath = null;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public static MediaProjection takePendingMediaProjection() {
+        MediaProjection mp = _pendingMediaProjection;
+        _pendingMediaProjection = null;
+        return mp;
     }
 
     public static String getSDCardPath() {

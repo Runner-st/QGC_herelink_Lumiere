@@ -75,6 +75,9 @@
             <!-- extract android style -->
         </activity>
         <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
+        <service android:name="org.mavlink.qgroundcontrol.ScreenRecorderService"
+                 android:foregroundServiceType="mediaProjection"
+                 android:exported="false"/>
         <service android:name="org.mavlink.qgroundcontrol.HerelinkNotificationService"
                  android:label="Herelink Telemetry"
                  android:process=":herelink"
@@ -105,6 +108,9 @@
     <uses-feature android:name="android.hardware.location.network" android:required="false"/>
     <uses-feature android:name="android.hardware.location" android:required="false"/>
     <uses-feature android:name="android.hardware.usb.accessory" android:required="false"/>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE"/>

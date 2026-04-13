@@ -20,7 +20,7 @@ win32 {
 } else {
     CUSTOM_QGC_VER_BUILD = $$system("echo $(($$CUSTOM_QGC_VER_BUILD - $$CUSTOM_QGC_VER_FIRST_BUILD))")
 }
-CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1107
+CUSTOM_QGC_VERSION = $${CUSTOM_QGC_VER_MAJOR}.$${CUSTOM_QGC_VER_MINOR}.$${CUSTOM_QGC_VER_PATCH}.1108
 
 DEFINES -= APP_VERSION_STR=\"\\\"$$APP_VERSION_STR\\\"\"
 DEFINES += APP_VERSION_STR=\"\\\"$$CUSTOM_QGC_VERSION\\\"\"
@@ -74,6 +74,7 @@ SOURCES += \
     $$PWD/src/GimbalControlController.cc \
     $$PWD/src/GimbalControlSettings.cc \
     $$PWD/src/Herelink/HerelinkTelemetry.cc \
+    $$PWD/src/AndroidScreenRecorder.cc \
 
 HEADERS += \
     $$PWD/src/HerelinkCorePlugin.h \
@@ -83,6 +84,7 @@ HEADERS += \
     $$PWD/src/GimbalControlController.h \
     $$PWD/src/GimbalControlSettings.h \
     $$PWD/src/Herelink/HerelinkTelemetry.h \
+    $$PWD/src/AndroidScreenRecorder.h \
 
 INCLUDEPATH += \
     $$PWD/src \
