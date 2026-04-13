@@ -50,7 +50,7 @@ Rectangle {
     property bool   _simplePhotoCaptureIsIdle:             true
     property bool   _videoStreamRecording:                      _videoStreamManager.recording
     property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
-    property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
+    property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : AndroidScreenRecorder.recording
     property bool   _videoStreamInPhotoMode:                    false
     property string _currentHdmiLabel:                          _videoStreamSettings && _videoStreamSettings.cameraId.rawValue === 0 ? qsTr("HDMI1") : qsTr("HDMI2")
     property string _activeVideoSource:                         _videoStreamSettings ? _videoStreamSettings.videoSource.rawValue : ""
@@ -139,11 +139,9 @@ Rectangle {
                 _videoStreamManager.grabImage()
                 simplePhotoCaptureTimer.start()
             } else {
-                if (_videoStreamManager.recording) {
-                    _videoStreamManager.stopRecording()
+                if (AndroidScreenRecorder.recording) {
                     AndroidScreenRecorder.stopRecording()
                 } else {
-                    _videoStreamManager.startRecording()
                     AndroidScreenRecorder.startRecording()
                 }
             }
