@@ -23,6 +23,11 @@ VideoStreamControl::VideoStreamControl()
     connect(_videoSettings->cameraId(), &Fact::rawValueChanged, this, &VideoStreamControl::_cameraIdChanged);
     connect(&_settingInProgressTimer, &QTimer::timeout, this, &VideoStreamControl::_settingInProgressTimeout);
     connect(&_settingInProgressTimerAck, &QTimer::timeout, this, &VideoStreamControl::_settingInProgressAckTimeout);
+
+    JoystickManager* joystickManager = qgcApp()->toolbox()->joystickManager();
+    connect(joystickManager, &JoystickManager::activeJoystickChanged,
+            this, &VideoStreamControl::_onActiveJoystickChanged);
+    _onActiveJoystickChanged(joystickManager->activeJoystick());
 }
 
 VideoStreamControl::~VideoStreamControl()
@@ -166,6 +171,27 @@ void VideoStreamControl::_startVideoStreaming() {
 
     emit videoNeedsReset();
     qDebug() << "_startVideoStreaming end, cameraId =" << _cameraIdSetting;
+}
+
+void VideoStreamControl::_onActiveJoystickChanged(Joystick* joystick)
+{
+    if (_activeJoystick) {
+        disconnect(_activeJoystick, &Joystick::stepStream, this, &VideoStreamControl::_onStepStream);
+    }
+    _activeJoystick = joystick;
+    if (_activeJoystick) {
+        connect(_activeJoystick, &Joystick::stepStream, this, &VideoStreamControl::_onStepStream);
+    }
+}
+
+void VideoStreamControl::_onStepStream(int direction)
+{
+    Q_UNUSED(direction);
+    if (_settingInProgress || _linkInterface == nullptr) {
+        return;
+    }
+    uint32_t next = (_videoSettings->cameraId()->rawValue().toUInt() == 0) ? 1 : 0;
+    _videoSettings->cameraId()->setRawValue(next);
 }
 
 void VideoStreamControl::_setSettingInProgress(bool inProgress)
