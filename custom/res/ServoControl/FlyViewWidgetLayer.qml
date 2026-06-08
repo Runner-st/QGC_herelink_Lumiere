@@ -363,14 +363,14 @@ Item {
         property real leftEdgeTopInset: visible ? x + width : 0
     }
 
-    VideoSourceWidget {
-        id:                     videoSourceWidget
-        anchors.right:          parent.right
-        anchors.rightMargin:    _toolsMargin
-        anchors.verticalCenter: parent.verticalCenter
-        z:                      QGroundControl.zOrderWidgets
-        visible:                !QGroundControl.videoManager.fullScreen
-    }
+//    VideoSourceWidget {
+//        id:                     videoSourceWidget
+//        anchors.right:          parent.right
+//        anchors.rightMargin:    _toolsMargin
+//        anchors.verticalCenter: parent.verticalCenter
+//        z:                      QGroundControl.zOrderWidgets
+//        visible:                !QGroundControl.videoManager.fullScreen
+//    }
 
     GripperMenu {
         id: gripperOptions

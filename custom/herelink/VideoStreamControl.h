@@ -5,6 +5,8 @@
 #include "MAVLinkProtocol.h"
 #include "VideoSettings.h"
 #include "SettingsManager.h"
+#include "JoystickManager.h"
+#include "Joystick.h"
 
 Q_DECLARE_LOGGING_CATEGORY(VideoStreamControlLog)
 
@@ -27,6 +29,8 @@ private slots:
     void _settingInProgressTimeout();
     void _settingInProgressAckTimeout();
     void _cameraIdChanged();
+    void _onActiveJoystickChanged(Joystick* joystick);
+    void _onStepStream(int direction);
 
 private:
     int _systemId;
@@ -39,6 +43,7 @@ private:
     uint32_t _cameraCount;
     uint32_t _cameraIdSetting;
     bool _settingInProgress;
+    Joystick* _activeJoystick = nullptr;
 
     void _handleHeartbeatInfo(LinkInterface* link, mavlink_message_t& message);
     void _setCameraId();
