@@ -292,18 +292,29 @@ QString AppSettings::logSavePath(void)
 
 QString AppSettings::videoSavePath(void)
 {
-    // QString path = savePath()->rawValue().toString();
-    // if (!path.isEmpty() && QDir(path).exists()) {
-    //     QDir dir(path);
-    //     return dir.filePath(videoDirectory);
-    // }
-    QString path = "/storage/emulated/0/DCIM";
+    QString path;
 
-    if (QDir(path).exists()) {
-        return path;
+#ifdef __android__
+    if (androidSaveToSDCard()->rawValue().toBool()) {
+        QString sdCardPath = AndroidInterface::getSDCardPath();
+        if (!sdCardPath.isEmpty() && QDir(sdCardPath).exists() && QFileInfo(sdCardPath).isWritable()) {
+            QString sdDcimPath = QDir(sdCardPath).filePath("DCIM");
+            QDir().mkpath(sdDcimPath);
+            if (QDir(sdDcimPath).exists()) {
+                path = sdDcimPath;
+            }
+        }
+    }
+#endif
+
+    if (path.isEmpty()) {
+        path = "/storage/emulated/0/DCIM";
+        if (!QDir(path).exists()) {
+            path.clear();
+        }
     }
 
-    return QString();
+    return path;
 }
 
 QString AppSettings::photoSavePath(void)

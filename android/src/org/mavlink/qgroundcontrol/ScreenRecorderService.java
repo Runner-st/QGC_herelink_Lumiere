@@ -9,7 +9,6 @@ import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
@@ -145,13 +144,11 @@ public class ScreenRecorderService extends Service {
         stopForeground(true);
         QGCActivity.nativeScreenRecordingStatusChanged(false);
 
-        // Notify media scanner using the same mechanism as GStreamer so the file
-        // appears in the Gallery immediately.
+        // Register the file with MediaStore (with a legacy-broadcast fallback) so it
+        // appears in the Gallery immediately, on internal storage or SD card alike.
         if (savedPath != null) {
-            Intent scanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
-            scanIntent.setData(Uri.parse("file://" + savedPath));
-            sendBroadcast(scanIntent);
-            QGCActivity.qgcLogDebug("ScreenRecorderService: sent MEDIA_SCANNER_SCAN_FILE for " + savedPath);
+            QGCActivity.scanMediaFile(savedPath, "video/mp4");
+            QGCActivity.qgcLogDebug("ScreenRecorderService: requested media scan for " + savedPath);
         }
     }
 

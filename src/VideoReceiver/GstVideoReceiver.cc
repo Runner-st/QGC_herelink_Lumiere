@@ -1666,35 +1666,17 @@ GstVideoReceiver::_keyframeWatch(GstPad* pad, GstPadProbeInfo* info, gpointer us
 
 void GstVideoReceiver::_scanMedia(const QString& path)
 {
-    QString uri = "file://" + path;
+    QAndroidJniObject jPath = QAndroidJniObject::fromString(path);
+    QAndroidJniObject jMime = QAndroidJniObject::fromString(QStringLiteral("video/mp4"));
 
-    QAndroidJniObject action = QAndroidJniObject::fromString(
-        "android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+    QAndroidJniObject::callStaticMethod<void>(
+        "org/mavlink/qgroundcontrol/QGCActivity",
+        "scanMediaFile",
+        "(Ljava/lang/String;Ljava/lang/String;)V",
+        jPath.object<jstring>(),
+        jMime.object<jstring>());
 
-    QAndroidJniObject uriObj = QAndroidJniObject::callStaticObjectMethod(
-        "android/net/Uri",
-        "parse",
-        "(Ljava/lang/String;)Landroid/net/Uri;",
-        QAndroidJniObject::fromString(uri).object<jstring>());
-
-    QAndroidJniObject intent(
-        "android/content/Intent",
-        "(Ljava/lang/String;Landroid/net/Uri;)V",
-        action.object<jstring>(),
-        uriObj.object());
-
-    QAndroidJniObject activity =
-        QAndroidJniObject::callStaticObjectMethod(
-            "org/qtproject/qt5/android/QtNative",
-            "activity",
-            "()Landroid/app/Activity;");
-
-    activity.callMethod<void>(
-        "sendBroadcast",
-        "(Landroid/content/Intent;)V",
-        intent.object());
-
-    qCInfo(VideoReceiverLog) << "try to save" << uri;
+    qCInfo(VideoReceiverLog) << "try to save" << path;
 }
 #else
 void GstVideoReceiver::_scanMedia(const QString& path)

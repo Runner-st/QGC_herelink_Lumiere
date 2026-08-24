@@ -43,9 +43,13 @@ import java.lang.reflect.Method;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.provider.MediaStore;
+import java.io.File;
 import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -932,6 +936,45 @@ public class QGCActivity extends QtActivity
             }
         }
         return "";
+    }
+
+    // Called from ScreenRecorderService and GstVideoReceiver (JNI) after a recording is
+    // written to disk, so it shows up in the Gallery. The legacy MEDIA_SCANNER_SCAN_FILE
+    // broadcast (used previously) only gets picked up by this ROM's media provider for the
+    // primary internal volume - files on a removable SD card stay invisible until a full
+    // device reboot triggers a full media rescan. Inserting the row into MediaStore directly
+    // registers it immediately regardless of which volume it's on. Falls back to the old
+    // broadcast if the insert is rejected, so internal-storage behavior can't regress.
+    public static void scanMediaFile(String path, String mimeType) {
+        if (_instance == null || path == null) {
+            return;
+        }
+
+        boolean inserted = false;
+        try {
+            File file = new File(path);
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, file.getName());
+            values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
+            values.put(MediaStore.MediaColumns.DATA, path);
+            values.put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
+            values.put(MediaStore.MediaColumns.SIZE, file.length());
+
+            Uri result = _instance.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+            inserted = (result != null);
+            if (inserted) {
+                Log.i(TAG, "scanMediaFile: registered via MediaStore insert - " + path);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "scanMediaFile: MediaStore insert failed - " + e.getMessage());
+        }
+
+        if (!inserted) {
+            Intent scanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+            scanIntent.setData(Uri.parse("file://" + path));
+            _instance.sendBroadcast(scanIntent);
+            Log.i(TAG, "scanMediaFile: fell back to MEDIA_SCANNER_SCAN_FILE broadcast - " + path);
+        }
     }
 }
 
